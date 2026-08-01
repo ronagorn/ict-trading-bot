@@ -1,0 +1,9 @@
+MetaTrader5
+smartmoneyconcepts
+supabase
+python-telegram-bot
+streamlit
+pandas
+python-dotenv
+google-generativeai
+plotly
