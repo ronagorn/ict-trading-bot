@@ -1,0 +1,63 @@
+2026-08-01 12:48:43,179 - ict_bot - INFO - Initializing ICT Trading Bot...
+2026-08-01 12:49:39,601 - ict_bot - INFO - Initializing ICT Trading Bot...
+2026-08-01 12:50:14,911 - ict_bot - ERROR - MT5 initialize failed, error code: (-6, 'Terminal: Authorization failed')
+2026-08-01 12:50:14,913 - ict_bot - ERROR - Failed to connect to MT5. Exiting.
+2026-08-01 12:51:40,154 - ict_bot - INFO - Initializing ICT Trading Bot...
+2026-08-01 12:52:09,673 - ict_bot - INFO - Connected to MT5 Server: XMGlobal-MT5 5 (Account: 108130219)
+2026-08-01 12:56:47,870 - ict_bot - INFO - Initializing ICT Trading Bot...
+2026-08-01 12:56:47,918 - ict_bot - INFO - Connected to MT5 Server: XMGlobal-MT5 5 (Account: 108130219)
+2026-08-01 12:56:55,972 - ict_bot - DEBUG - Outside of killzones. Waiting...
+2026-08-01 12:57:55,977 - ict_bot - DEBUG - Outside of killzones. Waiting...
+2026-08-01 12:58:55,980 - ict_bot - DEBUG - Outside of killzones. Waiting...
+2026-08-01 12:59:55,983 - ict_bot - DEBUG - Outside of killzones. Waiting...
+2026-08-01 13:00:55,985 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:00:55,992 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:00:55,993 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:01:55,999 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:01:56,000 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:01:56,001 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:02:56,004 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:02:56,005 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:02:56,007 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:03:56,009 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:03:56,010 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:03:56,012 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:04:56,016 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:04:56,018 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:04:56,020 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:05:56,023 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:05:56,024 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:05:56,026 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:06:56,035 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:06:56,037 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:06:56,039 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:07:56,041 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:07:56,043 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:07:56,044 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:08:56,046 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:08:56,048 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:08:56,049 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:09:56,051 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:09:56,053 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:09:56,054 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:10:56,056 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:10:56,058 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:10:56,059 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:11:56,063 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:11:56,065 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:11:56,067 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:12:56,071 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:12:56,073 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:12:56,074 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:13:56,077 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:13:56,080 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:13:56,081 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:14:56,084 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:14:56,085 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:14:56,086 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:15:56,089 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:15:56,090 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:15:56,092 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
+2026-08-01 13:16:56,099 - ict_bot - INFO - Currently in london Killzone
+2026-08-01 13:16:56,101 - ict_bot - ERROR - Failed to get symbol info for XAUUSD
+2026-08-01 13:16:56,102 - ict_bot - ERROR - Failed to get symbol info for BTCUSD
