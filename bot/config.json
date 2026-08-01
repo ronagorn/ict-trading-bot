@@ -1,0 +1,42 @@
+{
+  "symbols": [
+    "GOLD#",
+    "BTCUSD#",
+    "EURUSD#",
+    "GBPUSD#",
+    "USDJPY#",
+    "USDCAD#",
+    "EURGBP#",
+    "GBPJPY#"
+  ],
+  "risk_per_trade_percent": 1.0,
+  "daily_drawdown_limit_percent": 3.0,
+  "max_trades_per_day": 100,
+  "max_open_orders": 100,
+  "min_rr_ratio": 1.5,
+  "max_spread_points": {
+    "GOLD#": 35,
+    "BTCUSD#": 600,
+    "EURUSD#": 20,
+    "GBPUSD#": 25,
+    "USDJPY#": 20,
+    "USDCAD#": 20,
+    "EURGBP#": 20,
+    "GBPJPY#": 30
+  },
+  "killzones_ny_time": {
+    "london": {
+      "start": "02:00",
+      "end": "05:00",
+      "enabled": true
+    },
+    "new_york": {
+      "start": "08:00",
+      "end": "12:00",
+      "enabled": true
+    }
+  },
+  "ai_rules": {
+    "disable_underperforming_sessions": false
+  }
+}

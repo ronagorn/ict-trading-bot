@@ -1,0 +1,12 @@
+MetaTrader5; sys_platform == 'win32'
+metaapi-python-sdk
+smartmoneyconcepts
+supabase
+python-telegram-bot
+streamlit
+pandas
+python-dotenv
+google-generativeai
+plotly
+requests
+gunicorn
