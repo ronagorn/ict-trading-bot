@@ -10,9 +10,10 @@
     "GBPJPY#"
   ],
   "risk_per_trade_percent": 1.0,
-  "daily_drawdown_limit_percent": 3.0,
-  "max_trades_per_day": 100,
-  "max_open_orders": 100,
+  "daily_drawdown_limit_percent": 6.0,
+  "max_concurrent_trades": 2,
+  "max_trades_per_day": 30,
+  "max_open_orders": 2,
   "min_rr_ratio": 1.5,
   "max_spread_points": {
     "GOLD#": 300,

@@ -135,8 +135,65 @@ def main():
     if positions:
         tracked_open_tickets = {pos.ticket for pos in positions}
     
+    # ---------------------------------------------------------
+    # ตั้งค่า Callbacks ให้กับ Telegram Bot Listener
+    # ---------------------------------------------------------
+    def get_status_summary():
+        current_pos = mt5.positions_get()
+        active_pos_count = len(current_pos) if current_pos else 0
+        return (
+            f"<b>MT5 Terminal:</b> Connected ✅\n"
+            f"<b>คู่เงินที่สแกน:</b> {', '.join(symbols)}\n"
+            f"<b>ออเดอร์เปิดอยู่:</b> {active_pos_count} ไม้\n"
+            f"<b>โควตาเทรดวันนี้:</b> {daily_trades_count}/{max_trades} ไม้"
+        )
+
+    def get_balance_summary():
+        acc_info = mt5_client.get_account_info()
+        if not acc_info:
+            return "❌ ไม่สามารถดึงข้อมูลบัญชี MT5 ได้"
+        floating_profit = acc_info.equity - acc_info.balance
+        pnl_prefix = "+" if floating_profit >= 0 else ""
+        return (
+            f"<b>Balance:</b> ${acc_info.balance:,.2f}\n"
+            f"<b>Equity:</b> ${acc_info.equity:,.2f}\n"
+            f"<b>Free Margin:</b> ${acc_info.margin_free:,.2f}\n"
+            f"<b>Floating P/L:</b> {pnl_prefix}${floating_profit:,.2f}"
+        )
+
+    def get_positions_summary():
+        open_pos = mt5.positions_get()
+        if not open_pos:
+            return "ℹ️ ไม่มีออเดอร์ที่เปิดอยู่ ณ ขณะนี้"
+        
+        lines = []
+        for pos in open_pos:
+            pos_type = "BUY 🟢" if pos.type == 0 else "SELL 🔴"
+            pnl_str = f"+${pos.profit:.2f}" if pos.profit >= 0 else f"-${abs(pos.profit):.2f}"
+            lines.append(
+                f"• <b>#{pos.ticket}</b> {pos.symbol} ({pos_type})\n"
+                f"  Lot: {pos.volume} | Entry: {pos.price_open:.2f}\n"
+                f"  SL: {pos.sl:.2f} | TP: {pos.tp:.2f}\n"
+                f"  กำไร/ขาดทุน: <b>{pnl_str}</b>"
+            )
+        return "\n\n".join(lines)
+
+    def get_ai_summary():
+        result = ai.analyze_daily_performance()
+        if not result:
+            return "ℹ️ Gemini AI ยังไม่มีข้อมูลบทวิเคราะห์เพิ่มเติมสำหรับวันนี้"
+        return result
+
+    tg.set_callback("status", get_status_summary)
+    tg.set_callback("balance", get_balance_summary)
+    tg.set_callback("positions", get_positions_summary)
+    tg.set_callback("ai_summary", get_ai_summary)
+
+    # เริ่มระบบ Telegram Command Listener (Background Thread)
+    tg.start_polling()
+
     # แจ้งเตือนเมื่อบอทเริ่มทำงาน
-    tg.send_message("🚀 <b>AURA Super Trader Bot Started</b>\nพร้อมสแกนกราฟเทรดจริง GOLD# & BTCUSD# ( High-Frequency FVG Engine + 4H Shield )")
+    tg.send_message("🚀 <b>AURA Super Trader Bot Started</b>\nพร้อมสแกนกราฟเทรดจริง GOLD# & BTCUSD# ( High-Frequency FVG Engine + 4H Shield )\n<i>คุณสามารถสั่งการหรือพิมพ์ถามผ่าน Telegram ได้แล้วครับ</i>")
 
     try:
         while True:
@@ -145,6 +202,11 @@ def main():
             
             # ✅ ตรวจสอบออเดอร์ที่ปิดไปแล้วและแจ้งผลทาง Telegram
             tracked_open_tickets = check_closed_trades(tracked_open_tickets, tg, db)
+
+            # หากถูกสั่ง PAUSE ผ่าน Telegram ให้รอและข้ามการสแกนเปิดออเดอร์
+            if tg.is_paused():
+                time.sleep(10)
+                continue
 
             # Heartbeat ทุก 4 ชั่วโมง
             if now_dt.hour % 4 == 0 and now_dt.hour != last_heartbeat_hour:
@@ -186,7 +248,15 @@ def main():
                 
             # วนลูปตรวจสอบแต่ละคู่เงิน
             for symbol in symbols:
-                # 0. เช็คว่าตลาดเปิดทำการอยู่หรือไม่ (เสาร์-อาทิตย์ ตลาด Forex & Gold ปิด, Crypto เปิด 24/7)
+                # 0.0 เช็คจำนวนออเดอร์ที่เปิดอยู่พร้อมกัน ไม่ให้เปิดไม้ซ้อนกันเกินกำหนด
+                current_positions = mt5.positions_get()
+                active_pos_count = len(current_positions) if current_positions else 0
+                max_concurrent = config.get("max_concurrent_trades", 2)
+                if active_pos_count >= max_concurrent:
+                    logger.debug(f"Max concurrent trades reached ({active_pos_count}/{max_concurrent}). Waiting for open trades to finish.")
+                    break
+
+                # 0.1 เช็คว่าตลาดเปิดทำการอยู่หรือไม่ (เสาร์-อาทิตย์ ตลาด Forex & Gold ปิด, Crypto เปิด 24/7)
                 if not mt5_client.is_market_open(symbol):
                     continue
 
@@ -255,6 +325,7 @@ def main():
         logger.error(f"Bot error: {e}")
         tg.send_message(f"🚨 <b>AURA Bot Error Crash:</b>\nเกิดข้อผิดพลาดทำให้บอทหยุดทำงาน: {e}")
     finally:
+        tg.stop_polling()
         tg.send_message("🔴 <b>AURA Bot Status: OFFLINE</b>")
         mt5_client.shutdown()
 
