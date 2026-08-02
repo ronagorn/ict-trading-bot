@@ -110,6 +110,19 @@ class MT5Client:
             return False
         return True
 
+    def is_market_open(self, symbol):
+        """ตรวจสอบว่าตลาดเปิดทำการอยู่หรือไม่ (Forex/Metals ปิดวันเสาร์-อาทิตย์, Crypto เปิด 24/7)"""
+        now_utc = datetime.now(timezone.utc)
+        weekday = now_utc.weekday()  # 5 = Saturday, 6 = Sunday
+        
+        if "BTC" in symbol or "ETH" in symbol or "CRYPTO" in symbol:
+            return True
+            
+        if weekday in [5, 6]:
+            return False
+            
+        return True
+
     def place_order(self, symbol, order_type, volume, price, sl, tp, comment="ICT_Bot"):
         """ส่งคำสั่งเทรด"""
         self.ensure_connection()
@@ -137,8 +150,12 @@ class MT5Client:
         }
 
         result = mt5.order_send(request)
+        if result.retcode == 10018: # TRADE_RETCODE_MARKET_CLOSED
+            logger.warning(f"Order skipped for {symbol}: ตลาดปิดทำการอยู่ในขณะนี้ (Market Closed)")
+            return None
+            
         if result.retcode != mt5.TRADE_RETCODE_DONE:
-            logger.error(f"Order failed, retcode={result.retcode}, comment={result.comment}")
+            logger.error(f"Order failed for {symbol}, retcode={result.retcode}, comment={result.comment}")
             return None
             
         logger.info(f"Order placed successfully: Ticket {result.order}")

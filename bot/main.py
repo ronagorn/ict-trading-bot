@@ -186,6 +186,10 @@ def main():
                 
             # วนลูปตรวจสอบแต่ละคู่เงิน
             for symbol in symbols:
+                # 0. เช็คว่าตลาดเปิดทำการอยู่หรือไม่ (เสาร์-อาทิตย์ ตลาด Forex & Gold ปิด, Crypto เปิด 24/7)
+                if not mt5_client.is_market_open(symbol):
+                    continue
+
                 # 1. เช็ค Spread Filter
                 max_spread = config.get("max_spread_points", {}).get(symbol, 40)
                 if not mt5_client.check_spread(symbol, max_spread):
