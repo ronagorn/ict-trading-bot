@@ -248,13 +248,10 @@ def main():
                 
             # วนลูปตรวจสอบแต่ละคู่เงิน
             for symbol in symbols:
-                # 0.0 เช็คจำนวนออเดอร์ที่เปิดอยู่พร้อมกัน ไม่ให้เปิดไม้ซ้อนกันเกินกำหนด
-                current_positions = mt5.positions_get()
-                active_pos_count = len(current_positions) if current_positions else 0
-                max_concurrent = config.get("max_concurrent_trades", 2)
-                if active_pos_count >= max_concurrent:
-                    logger.debug(f"Max concurrent trades reached ({active_pos_count}/{max_concurrent}). Waiting for open trades to finish.")
-                    break
+                # 0.0 ตรวจสอบโควตาความเสี่ยง: สิทธิเปิดออเดอร์ต่อคู่เงิน (ไม่เกิน 2 ไม้), รวมทั้งพอร์ต (ไม่เกิน 4 ไม้) และ Currency Correlation
+                current_positions = mt5.positions_get() or []
+                if not risk_manager.can_open_new_position(current_positions, symbol):
+                    continue
 
                 # 0.1 เช็คว่าตลาดเปิดทำการอยู่หรือไม่ (เสาร์-อาทิตย์ ตลาด Forex & Gold ปิด, Crypto เปิด 24/7)
                 if not mt5_client.is_market_open(symbol):
