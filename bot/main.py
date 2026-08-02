@@ -1,6 +1,7 @@
 import json
 import time
 import os
+import MetaTrader5 as mt5
 from datetime import datetime, timezone
 import pytz
 
@@ -21,40 +22,141 @@ def load_config():
         logger.error(f"Failed to load config.json: {e}")
         return {}
 
+def check_closed_trades(open_tickets: set, tg: TelegramNotifier, db) -> set:
+    """
+    ตรวจสอบว่ามีออเดอร์ที่เปิดอยู่ก่อนหน้า แต่ตอนนี้ปิดไปแล้วไหม
+    ถ้าปิดแล้วให้แจ้งเตือนผลการเทรดผ่าน Telegram ทันที
+    """
+    current_positions = mt5.positions_get()
+    current_tickets = set()
+    if current_positions:
+        current_tickets = {pos.ticket for pos in current_positions}
+
+    # หา ticket ที่หายไป = ออเดอร์ปิดแล้ว
+    closed_tickets = open_tickets - current_tickets
+
+    for ticket in closed_tickets:
+        try:
+            # ดึงประวัติออเดอร์ที่ปิดแล้วจาก MT5
+            from_time = datetime(2020, 1, 1, tzinfo=timezone.utc)
+            to_time = datetime.now(timezone.utc)
+            deals = mt5.history_deals_get(from_time, to_time)
+
+            if deals is None:
+                continue
+
+            # หา deal ที่ตรงกับ ticket นี้ (entry + exit)
+            deal_list = [d for d in deals if d.position_id == ticket]
+            if not deal_list:
+                continue
+
+            # entry deal = deal แรก, exit deal = deal สุดท้าย
+            entry_deal = next((d for d in deal_list if d.entry == 0), None)  # DEAL_ENTRY_IN = 0
+            exit_deal = next((d for d in deal_list if d.entry == 1), None)   # DEAL_ENTRY_OUT = 1
+
+            if not exit_deal:
+                continue
+
+            pnl = exit_deal.profit
+            symbol = exit_deal.symbol
+            volume = exit_deal.volume
+            close_price = exit_deal.price
+            close_time = datetime.fromtimestamp(exit_deal.time, tz=pytz.timezone('Asia/Bangkok')).strftime('%H:%M:%S')
+
+            entry_price = entry_deal.price if entry_deal else 0
+            order_type = "BUY" if exit_deal.type == 1 else "SELL"  # reverse: exit type 1 = closed buy
+
+            # สร้างข้อความแจ้งเตือน
+            if pnl > 0:
+                emoji = "✅"
+                result_text = "TP Hit! กำไร"
+                pnl_text = f"+${pnl:.2f} 💰"
+            elif pnl < 0:
+                emoji = "❌"
+                result_text = "SL Hit! ขาดทุน"
+                pnl_text = f"-${abs(pnl):.2f} 📉"
+            else:
+                emoji = "⚖️"
+                result_text = "Breakeven"
+                pnl_text = "$0.00"
+
+            msg = f"{emoji} <b>TRADE CLOSED — {result_text}</b>\n\n"
+            msg += f"<b>Ticket:</b> #{ticket}\n"
+            msg += f"<b>Symbol:</b> {symbol}\n"
+            msg += f"<b>Type:</b> {order_type}\n"
+            msg += f"<b>Entry Price:</b> {entry_price:.2f}\n"
+            msg += f"<b>Close Price:</b> {close_price:.2f}\n"
+            msg += f"<b>Lot Size:</b> {volume}\n"
+            msg += f"<b>Close Time:</b> {close_time} (ICT)\n"
+            msg += f"━━━━━━━━━━━━━━━━\n"
+            msg += f"<b>ผลกำไร/ขาดทุน: {pnl_text}</b>"
+
+            tg.send_message(msg)
+            logger.info(f"Trade #{ticket} closed. PnL: {pnl:.2f}")
+
+            # อัปเดตฐานข้อมูล
+            try:
+                db.update_trade_close(ticket, datetime.now(), pnl)
+            except Exception:
+                pass
+
+        except Exception as e:
+            logger.error(f"Error processing closed trade #{ticket}: {e}")
+
+    return current_tickets  # return ชุด tickets ที่ยังเปิดอยู่ตอนนี้
+
+
 def main():
-    logger.info("Initializing ICT Trading Bot...")
+    logger.info("Initializing Institutional ICT Trading Bot...")
     config = load_config()
+    tg = TelegramNotifier()
     
-    mt5_client = MT5Client()
+    mt5_client = MT5Client(tg)
     if not mt5_client.connect():
         logger.error("Failed to connect to MT5. Exiting.")
+        tg.send_message("🚨 <b>Bot Error:</b> ไม่สามารถเปิดหรือเชื่อมต่อโปรแกรม XM MT5 ได้")
         return
 
     db = SupabaseClient()
-    tg = TelegramNotifier()
     ai = AIAnalyzer(db, tg)
     
     strategy = ICTStrategy(mt5_client, config)
     risk_manager = RiskManager(config)
     
-    symbols = config.get("symbols", ["XAUUSD"])
-    max_trades = config.get("max_trades_per_day", 2)
+    symbols = config.get("symbols", ["GOLD#", "BTCUSD#"])
+    max_trades = config.get("max_trades_per_day", 30)
     daily_trades_count = 0
     current_date = datetime.now().date()
+    last_heartbeat_hour = -1
+
+    # ติดตาม open positions ปัจจุบัน
+    tracked_open_tickets = set()
+    positions = mt5.positions_get()
+    if positions:
+        tracked_open_tickets = {pos.ticket for pos in positions}
     
     # แจ้งเตือนเมื่อบอทเริ่มทำงาน
-    tg.send_message("🚀 <b>ICT Bot Started Successfully</b>\nReady to scan for setups.")
+    tg.send_message("🚀 <b>AURA Super Trader Bot Started</b>\nพร้อมสแกนกราฟเทรดจริง GOLD# & BTCUSD# ( High-Frequency FVG Engine + 4H Shield )")
 
     try:
         while True:
             now_date = datetime.now().date()
+            now_dt = datetime.now()
+            
+            # ✅ ตรวจสอบออเดอร์ที่ปิดไปแล้วและแจ้งผลทาง Telegram
+            tracked_open_tickets = check_closed_trades(tracked_open_tickets, tg, db)
+
+            # Heartbeat ทุก 4 ชั่วโมง
+            if now_dt.hour % 4 == 0 and now_dt.hour != last_heartbeat_hour:
+                last_heartbeat_hour = now_dt.hour
+                logger.info("Heartbeat: Bot running smoothly.")
+                tg.send_message(f"💓 <b>AURA System Heartbeat</b>\nบอททำงานปกติกำลังเฝ้าสแกนตลาด ({now_dt.strftime('%H:%M')} น.)")
             
             # Reset daily counters
             if now_date != current_date:
                 current_date = now_date
                 daily_trades_count = 0
                 logger.info("New day started, resetting trade counters.")
-                # รัน AI Analyzer ตอนจบวัน (หรือเมื่อขึ้นวันใหม่)
                 ai.analyze_daily_performance()
                 
             # ตรวจสอบ Drawdown limit
@@ -63,11 +165,10 @@ def main():
                 time.sleep(10)
                 continue
                 
-            # สมมติฐาน: initial_balance ของวันใช้ balance ปัจจุบัน + profit/loss ถ้าอยากให้แม่นต้องเก็บลง DB ทุกเริ่มวัน
-            # ในที่นี้เพื่อความเรียบง่าย จะเช็ค Equity เทียบกับ Balance (ซึ่ง MT5 Balance จะอัปเดตเมื่อไม้ปิด)
             if not risk_manager.check_daily_drawdown(acc_info.balance, acc_info.equity):
                 logger.warning("Daily drawdown limit reached. Pausing for the day.")
-                time.sleep(3600)  # พัก 1 ชั่วโมงแล้ววนลูปใหม่ เผื่อข้ามวัน
+                tg.send_message("⚠️ <b>Circuit Breaker Triggered</b>\nพอร์ตแตะขีดจำกัดความเสี่ยงรายวัน หยุดเทรดชั่วคราวเพื่อความปลอดภัย 24 ชม.")
+                time.sleep(3600)
                 continue
                 
             # ตรวจสอบ Trade Limit
@@ -86,19 +187,21 @@ def main():
             # วนลูปตรวจสอบแต่ละคู่เงิน
             for symbol in symbols:
                 # 1. เช็ค Spread Filter
-                max_spread = config.get("max_spread_points", {}).get(symbol, 30)
+                max_spread = config.get("max_spread_points", {}).get(symbol, 40)
                 if not mt5_client.check_spread(symbol, max_spread):
                     continue
 
-                # 2. วิเคราะห์ 4H Trend
-                trend = strategy.analyze_4h_trend(symbol)
-                logger.debug(f"{symbol} 4H Trend: {trend}")
+                # 2. วิเคราะห์ Multi-Timeframe Structure
+                trend = strategy.analyze_market_structure(symbol)
+                logger.debug(f"{symbol} MTF Trend: {trend}")
                 
-                # 3. หา 15M Entry Setup
-                setup = strategy.find_15m_entry(symbol, trend)
+                # 3. หา Entry Setup ระดับสไนเปอร์
+                setup = strategy.find_super_trader_setup(symbol, trend)
                 if setup:
+                    tp_target = setup.get('tp2', setup.get('tp1'))
+                    
                     # 4. ตรวจสอบ R:R Ratio
-                    if not risk_manager.validate_setup(setup['entry'], setup['sl'], setup['tp'], symbol):
+                    if not risk_manager.validate_setup(setup['entry'], setup['sl'], tp_target, symbol):
                         continue
                         
                     # 5. คำนวณ Lot Size
@@ -111,31 +214,44 @@ def main():
                         logger.warning(f"Calculated lot size is 0 for {symbol}")
                         continue
                         
-                    # 6. ส่งคำสั่งซื้อขาย (ส่งเป็น Market หรือ Limit ขึ้นอยู่กับ Setup, ในนี้ส่ง Market ไปที่ Entry Price ถ้าราคาถึง)
-                    # หมายเหตุ: ในความจริงอาจจะต้องใช้ MT5_ORDER_TYPE_BUY/SELL (Market) เพราะ current price แตะ zone พอดี
+                    # 6. ส่งคำสั่งซื้อขาย
                     ticket = mt5_client.place_order(
-                        symbol, setup['type'], lot_size, setup['entry'], setup['sl'], setup['tp']
+                        symbol, setup['type'], lot_size, setup['entry'], setup['sl'], tp_target
                     )
                     
                     if ticket:
                         daily_trades_count += 1
-                        logger.info(f"Trade executed: #{ticket} {setup['type']} {symbol} Lot: {lot_size}")
+                        tracked_open_tickets.add(ticket)  # เพิ่ม ticket ใหม่เข้า tracker
+                        logger.info(f"Trade executed: #{ticket} {setup['type']} {symbol} Lot: {lot_size} [{setup['source']}]")
                         
                         # บันทึกฐานข้อมูล
                         db.log_trade(
                             ticket, symbol, setup['type'], datetime.now(), setup['entry'], 
-                            setup['sl'], setup['tp'], lot_size, setup.get('fvg_size', 0), session_name
+                            setup['sl'], tp_target, lot_size, setup.get('fvg_size', 0), session_name
                         )
                         
-                        # แจ้งเตือน
-                        tg.notify_order_placed(symbol, setup['type'], setup['entry'], setup['sl'], setup['tp'], ticket)
+                        # แจ้งเตือน Telegram (Entry)
+                        msg = f"💥 <b>ENTRY SIGNAL EXECUTED [{setup['source']}]</b>\n\n"
+                        msg += f"<b>Ticket:</b> #{ticket}\n"
+                        msg += f"<b>Symbol:</b> {symbol}\n"
+                        msg += f"<b>Type:</b> {setup['type']}\n"
+                        msg += f"<b>Entry:</b> {setup['entry']:.2f}\n"
+                        msg += f"<b>SL:</b> {setup['sl']:.2f}\n"
+                        msg += f"<b>TP (1:1.5 Target):</b> {tp_target:.2f}\n"
+                        msg += f"<b>Lot Size:</b> {lot_size}\n"
+                        tg.send_message(msg)
 
-            # หน่วงเวลาลูป
-            time.sleep(60)
+            # หน่วงเวลาลูป (10 วิเพื่อสแกน + ตรวจออเดอร์ที่ปิด)
+            time.sleep(10)
 
     except KeyboardInterrupt:
         logger.info("Bot stopped by user.")
+        tg.send_message("🛑 <b>AURA Bot Shutting Down</b>\nผู้ใช้ได้ทำการปิดระบบการทำงานของบอทเรียบร้อยแล้ว")
+    except Exception as e:
+        logger.error(f"Bot error: {e}")
+        tg.send_message(f"🚨 <b>AURA Bot Error Crash:</b>\nเกิดข้อผิดพลาดทำให้บอทหยุดทำงาน: {e}")
     finally:
+        tg.send_message("🔴 <b>AURA Bot Status: OFFLINE</b>")
         mt5_client.shutdown()
 
 if __name__ == "__main__":

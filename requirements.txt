@@ -1,9 +1,11 @@
 MetaTrader5; sys_platform == 'win32'
 smartmoneyconcepts
-supabase
-python-telegram-bot
-streamlit
+pytz
 pandas
 python-dotenv
+requests
+supabase
+python-telegram-bot
 google-generativeai
 plotly
+streamlit

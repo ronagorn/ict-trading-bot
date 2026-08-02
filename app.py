@@ -1,24 +1,43 @@
 import streamlit as st
 import pandas as pd
 import os
-from supabase import create_client, Client
 from dotenv import load_dotenv
 import plotly.express as px
 
-# โหลดตัวแปรสภาพแวดล้อม
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
+# โหลดค่าจาก .env อัตโนมัติ (รองรับทั้งรันบน Local และเครื่องอื่น)
+# ตรวจสอบว่ามีไฟล์ .env ในโฟลเดอร์เดียวกัน หรือใน root directory
+env_path_parent = os.path.join(os.path.dirname(__file__), '..', '.env')
+env_path_current = os.path.join(os.path.dirname(__file__), '.env')
+
+if os.path.exists(env_path_current):
+    load_dotenv(dotenv_path=env_path_current)
+elif os.path.exists(env_path_parent):
+    load_dotenv(dotenv_path=env_path_parent)
+else:
+    load_dotenv()
+
+# นำเข้า supabase แบบ optional (ไม่ crash ถ้าไม่ได้ติดตั้ง)
+try:
+    from supabase import create_client, Client
+    SUPABASE_AVAILABLE = True
+except ImportError:
+    SUPABASE_AVAILABLE = False
 
 st.set_page_config(page_title="ICT Trading Bot Dashboard", layout="wide", page_icon="📈")
 
 @st.cache_resource
 def init_connection():
-    # รองรับทั้ง st.secrets (สำหรับ Streamlit Cloud) และ os.getenv (สำหรับ Local)
-    url = st.secrets.get("SUPABASE_URL") if "SUPABASE_URL" in st.secrets else os.getenv("SUPABASE_URL")
-    key = st.secrets.get("SUPABASE_KEY") if "SUPABASE_KEY" in st.secrets else os.getenv("SUPABASE_KEY")
-    
+    """เชื่อมต่อ Supabase ผ่าน os.getenv() เท่านั้น ไม่พึ่ง st.secrets"""
+    if not SUPABASE_AVAILABLE:
+        return None
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_KEY")
     if not url or not key:
         return None
-    return create_client(url, key)
+    try:
+        return create_client(url, key)
+    except Exception:
+        return None
 
 supabase = init_connection()
 
@@ -26,7 +45,17 @@ st.title("📈 ICT & SMC Algorithmic Trading Dashboard")
 st.markdown("ระบบเทรดอัตโนมัติตามหลักการ Inner Circle Trader (ICT) - บริหารโดย **AURA-QUANT**")
 
 if not supabase:
-    st.error("⚠️ ไม่สามารถเชื่อมต่อฐานข้อมูล Supabase ได้ กรุณาตรวจสอบการตั้งค่า Secrets / .env")
+    st.info(
+        "ℹ️ ยังไม่ได้ตั้งค่า Supabase — Dashboard กำลังทำงานในโหมด Offline\n\n"
+        "บอทยังเทรดได้ปกติ แต่ไม่มีการบันทึกประวัติออเดอร์ลงฐานข้อมูล\n\n"
+        "**เพิ่ม Supabase:** ใส่ `SUPABASE_URL` และ `SUPABASE_KEY` ลงในไฟล์ `.env` แล้วรีสตาร์ท Dashboard ครับ"
+    )
+    st.markdown("### 📋 วิธีตั้งค่า Supabase")
+    st.code("""
+# เพิ่มบรรทัดเหล่านี้ในไฟล์ .env
+SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
+SUPABASE_KEY=your_supabase_anon_key
+    """, language="bash")
     st.stop()
 
 @st.cache_data(ttl=30)
