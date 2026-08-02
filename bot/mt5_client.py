@@ -3,6 +3,7 @@ import pandas as pd
 from dotenv import load_dotenv
 import os
 import time
+from datetime import datetime, timezone
 from bot.logger import logger
 
 load_dotenv()
