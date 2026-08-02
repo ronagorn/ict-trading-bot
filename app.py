@@ -5,7 +5,16 @@ from dotenv import load_dotenv
 import plotly.express as px
 
 # โหลดค่าจาก .env อัตโนมัติ (รองรับทั้งรันบน Local และเครื่องอื่น)
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
+# ตรวจสอบว่ามีไฟล์ .env ในโฟลเดอร์เดียวกัน หรือใน root directory
+env_path_parent = os.path.join(os.path.dirname(__file__), '..', '.env')
+env_path_current = os.path.join(os.path.dirname(__file__), '.env')
+
+if os.path.exists(env_path_current):
+    load_dotenv(dotenv_path=env_path_current)
+elif os.path.exists(env_path_parent):
+    load_dotenv(dotenv_path=env_path_parent)
+else:
+    load_dotenv()
 
 # นำเข้า supabase แบบ optional (ไม่ crash ถ้าไม่ได้ติดตั้ง)
 try:
@@ -18,18 +27,9 @@ st.set_page_config(page_title="ICT Trading Bot Dashboard", layout="wide", page_i
 
 @st.cache_resource
 def init_connection():
-    """เชื่อมต่อ Supabase — รองรับทั้ง Streamlit Cloud (st.secrets) และ Local (.env)"""
+    """เชื่อมต่อ Supabase ผ่าน os.getenv() เท่านั้น ไม่พึ่ง st.secrets"""
     if not SUPABASE_AVAILABLE:
         return None
-    # ลองจาก st.secrets ก่อน (Streamlit Community Cloud)
-    try:
-        url = st.secrets.get("SUPABASE_URL") or st.secrets.get("SUPABASE", {}).get("SUPABASE_URL")
-        key = st.secrets.get("SUPABASE_KEY") or st.secrets.get("SUPABASE", {}).get("SUPABASE_KEY")
-        if url and key:
-            return create_client(url, key)
-    except Exception:
-        pass
-    # fallback: อ่านจาก .env (Local)
     url = os.getenv("SUPABASE_URL")
     key = os.getenv("SUPABASE_KEY")
     if not url or not key:

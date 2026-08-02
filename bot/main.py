@@ -1,6 +1,7 @@
 import json
 import time
 import os
+import MetaTrader5 as mt5
 from datetime import datetime, timezone
 import pytz
 
@@ -20,6 +21,90 @@ def load_config():
     except Exception as e:
         logger.error(f"Failed to load config.json: {e}")
         return {}
+
+def check_closed_trades(open_tickets: set, tg: TelegramNotifier, db) -> set:
+    """
+    ตรวจสอบว่ามีออเดอร์ที่เปิดอยู่ก่อนหน้า แต่ตอนนี้ปิดไปแล้วไหม
+    ถ้าปิดแล้วให้แจ้งเตือนผลการเทรดผ่าน Telegram ทันที
+    """
+    current_positions = mt5.positions_get()
+    current_tickets = set()
+    if current_positions:
+        current_tickets = {pos.ticket for pos in current_positions}
+
+    # หา ticket ที่หายไป = ออเดอร์ปิดแล้ว
+    closed_tickets = open_tickets - current_tickets
+
+    for ticket in closed_tickets:
+        try:
+            # ดึงประวัติออเดอร์ที่ปิดแล้วจาก MT5
+            from_time = datetime(2020, 1, 1, tzinfo=timezone.utc)
+            to_time = datetime.now(timezone.utc)
+            deals = mt5.history_deals_get(from_time, to_time)
+
+            if deals is None:
+                continue
+
+            # หา deal ที่ตรงกับ ticket นี้ (entry + exit)
+            deal_list = [d for d in deals if d.position_id == ticket]
+            if not deal_list:
+                continue
+
+            # entry deal = deal แรก, exit deal = deal สุดท้าย
+            entry_deal = next((d for d in deal_list if d.entry == 0), None)  # DEAL_ENTRY_IN = 0
+            exit_deal = next((d for d in deal_list if d.entry == 1), None)   # DEAL_ENTRY_OUT = 1
+
+            if not exit_deal:
+                continue
+
+            pnl = exit_deal.profit
+            symbol = exit_deal.symbol
+            volume = exit_deal.volume
+            close_price = exit_deal.price
+            close_time = datetime.fromtimestamp(exit_deal.time, tz=pytz.timezone('Asia/Bangkok')).strftime('%H:%M:%S')
+
+            entry_price = entry_deal.price if entry_deal else 0
+            order_type = "BUY" if exit_deal.type == 1 else "SELL"  # reverse: exit type 1 = closed buy
+
+            # สร้างข้อความแจ้งเตือน
+            if pnl > 0:
+                emoji = "✅"
+                result_text = "TP Hit! กำไร"
+                pnl_text = f"+${pnl:.2f} 💰"
+            elif pnl < 0:
+                emoji = "❌"
+                result_text = "SL Hit! ขาดทุน"
+                pnl_text = f"-${abs(pnl):.2f} 📉"
+            else:
+                emoji = "⚖️"
+                result_text = "Breakeven"
+                pnl_text = "$0.00"
+
+            msg = f"{emoji} <b>TRADE CLOSED — {result_text}</b>\n\n"
+            msg += f"<b>Ticket:</b> #{ticket}\n"
+            msg += f"<b>Symbol:</b> {symbol}\n"
+            msg += f"<b>Type:</b> {order_type}\n"
+            msg += f"<b>Entry Price:</b> {entry_price:.2f}\n"
+            msg += f"<b>Close Price:</b> {close_price:.2f}\n"
+            msg += f"<b>Lot Size:</b> {volume}\n"
+            msg += f"<b>Close Time:</b> {close_time} (ICT)\n"
+            msg += f"━━━━━━━━━━━━━━━━\n"
+            msg += f"<b>ผลกำไร/ขาดทุน: {pnl_text}</b>"
+
+            tg.send_message(msg)
+            logger.info(f"Trade #{ticket} closed. PnL: {pnl:.2f}")
+
+            # อัปเดตฐานข้อมูล
+            try:
+                db.update_trade_close(ticket, datetime.now(), pnl)
+            except Exception:
+                pass
+
+        except Exception as e:
+            logger.error(f"Error processing closed trade #{ticket}: {e}")
+
+    return current_tickets  # return ชุด tickets ที่ยังเปิดอยู่ตอนนี้
+
 
 def main():
     logger.info("Initializing Institutional ICT Trading Bot...")
@@ -43,6 +128,12 @@ def main():
     daily_trades_count = 0
     current_date = datetime.now().date()
     last_heartbeat_hour = -1
+
+    # ติดตาม open positions ปัจจุบัน
+    tracked_open_tickets = set()
+    positions = mt5.positions_get()
+    if positions:
+        tracked_open_tickets = {pos.ticket for pos in positions}
     
     # แจ้งเตือนเมื่อบอทเริ่มทำงาน
     tg.send_message("🚀 <b>AURA Super Trader Bot Started</b>\nพร้อมสแกนกราฟเทรดจริง GOLD# & BTCUSD# ( High-Frequency FVG Engine + 4H Shield )")
@@ -52,7 +143,10 @@ def main():
             now_date = datetime.now().date()
             now_dt = datetime.now()
             
-            # Hourly Heartbeat (แจ้งเตือนความพร้อมของบอททุกๆ 4 ชั่วโมง)
+            # ✅ ตรวจสอบออเดอร์ที่ปิดไปแล้วและแจ้งผลทาง Telegram
+            tracked_open_tickets = check_closed_trades(tracked_open_tickets, tg, db)
+
+            # Heartbeat ทุก 4 ชั่วโมง
             if now_dt.hour % 4 == 0 and now_dt.hour != last_heartbeat_hour:
                 last_heartbeat_hour = now_dt.hour
                 logger.info("Heartbeat: Bot running smoothly.")
@@ -127,6 +221,7 @@ def main():
                     
                     if ticket:
                         daily_trades_count += 1
+                        tracked_open_tickets.add(ticket)  # เพิ่ม ticket ใหม่เข้า tracker
                         logger.info(f"Trade executed: #{ticket} {setup['type']} {symbol} Lot: {lot_size} [{setup['source']}]")
                         
                         # บันทึกฐานข้อมูล
@@ -135,18 +230,18 @@ def main():
                             setup['sl'], tp_target, lot_size, setup.get('fvg_size', 0), session_name
                         )
                         
-                        # แจ้งเตือน Telegram
+                        # แจ้งเตือน Telegram (Entry)
                         msg = f"💥 <b>ENTRY SIGNAL EXECUTED [{setup['source']}]</b>\n\n"
                         msg += f"<b>Ticket:</b> #{ticket}\n"
                         msg += f"<b>Symbol:</b> {symbol}\n"
                         msg += f"<b>Type:</b> {setup['type']}\n"
                         msg += f"<b>Entry:</b> {setup['entry']:.2f}\n"
                         msg += f"<b>SL:</b> {setup['sl']:.2f}\n"
-                        msg += f"<b>TP (1:3 Target):</b> {setup['tp']:.2f}\n"
+                        msg += f"<b>TP (1:1.5 Target):</b> {tp_target:.2f}\n"
                         msg += f"<b>Lot Size:</b> {lot_size}\n"
                         tg.send_message(msg)
 
-            # หน่วงเวลาลูป
+            # หน่วงเวลาลูป (10 วิเพื่อสแกน + ตรวจออเดอร์ที่ปิด)
             time.sleep(10)
 
     except KeyboardInterrupt:
