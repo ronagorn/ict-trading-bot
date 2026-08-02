@@ -15,14 +15,14 @@
   "max_open_orders": 100,
   "min_rr_ratio": 1.5,
   "max_spread_points": {
-    "GOLD#": 35,
-    "BTCUSD#": 600,
-    "EURUSD#": 20,
-    "GBPUSD#": 25,
-    "USDJPY#": 20,
-    "USDCAD#": 20,
-    "EURGBP#": 20,
-    "GBPJPY#": 30
+    "GOLD#": 300,
+    "BTCUSD#": 5000,
+    "EURUSD#": 100,
+    "GBPUSD#": 100,
+    "USDJPY#": 100,
+    "USDCAD#": 100,
+    "EURGBP#": 100,
+    "GBPJPY#": 150
   },
   "killzones_ny_time": {
     "london": {
