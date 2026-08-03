@@ -1,6 +1,6 @@
 $WshShell = New-Object -comObject WScript.Shell
 $DesktopPath = [Environment]::GetFolderPath("Desktop")
-$IconPath = "D:\antigravity\AI-Super-trader\ict-trading-bot\aura_cute_logo.ico"
+$IconPath = "D:\antigravity\AI-Super-trader\ict-trading-bot\aura_cute_icon_v2.ico"
 $WorkDir = "D:\antigravity\AI-Super-trader\ict-trading-bot"
 
 # 1. ลบ Shortcut เก่า/ที่ซ้ำซ้อนทิ้งให้หมด
