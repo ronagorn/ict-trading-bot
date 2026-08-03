@@ -8,6 +8,8 @@ from bot.logger import logger
 
 load_dotenv()
 
+import ctypes
+
 class MT5Client:
     def __init__(self, tg=None):
         self.login = int(os.getenv("MT5_LOGIN", 0))
@@ -16,6 +18,55 @@ class MT5Client:
         self.mt5_path = os.getenv("MT5_PATH", r"C:\Program Files\XM Global MT5\terminal64.exe")
         self.connected = False
         self.tg = tg
+
+    def hide_window(self):
+        """ซ่อนหน้าต่าง XM MT5 และซ่อนไอคอนจาก Taskbar ด้านล่างทั้งหมด (SW_HIDE)"""
+        try:
+            info = mt5.terminal_info()
+            if not info:
+                return False
+            target_pid = getattr(info, 'pid', getattr(info, 'process_id', None))
+            
+            user32 = ctypes.windll.user32
+            EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_int, ctypes.c_int)
+            
+            def foreach_window(hwnd, lparam):
+                pid = ctypes.c_ulong()
+                user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+                if pid.value == target_pid:
+                    user32.ShowWindow(hwnd, 0)  # 0 = SW_HIDE (ซ่อนหน้าต่างและ Taskbar)
+                return True
+
+            user32.EnumWindows(EnumWindowsProc(foreach_window), 0)
+            logger.info("XM MT5 Terminal window hidden from Taskbar.")
+            return True
+        except Exception as e:
+            logger.warning(f"Could not hide MT5 window: {e}")
+            return False
+
+    def show_window(self):
+        """แสดงหน้าต่าง XM MT5 กลับขึ้นมาบน Taskbar"""
+        try:
+            info = mt5.terminal_info()
+            if not info:
+                return False
+            target_pid = getattr(info, 'pid', getattr(info, 'process_id', None))
+            
+            user32 = ctypes.windll.user32
+            EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_int, ctypes.c_int)
+            
+            def foreach_window(hwnd, lparam):
+                pid = ctypes.c_ulong()
+                user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+                if pid.value == target_pid:
+                    user32.ShowWindow(hwnd, 5)  # 5 = SW_SHOW
+                return True
+
+            user32.EnumWindows(EnumWindowsProc(foreach_window), 0)
+            return True
+        except Exception as e:
+            logger.warning(f"Could not show MT5 window: {e}")
+            return False
 
     def connect(self):
         """เชื่อมต่อกับ MetaTrader 5 Terminal (เปิดโปรแกรมและ Login อัตโนมัติในคลิกเดียว)"""
@@ -41,6 +92,12 @@ class MT5Client:
             
         logger.info(f"Connected to MT5 Server: {self.server} (Account: {self.login})")
         self.connected = True
+
+        # ซ่อนหน้าต่าง XM MT5 จาก Taskbar เฉพาะเมื่อตั้งค่า HIDE_MT5=1 ใน .env
+        if os.getenv("HIDE_MT5", "0") == "1":
+            time.sleep(1) # รอโปรแกรมขึ้นแป๊บหนึ่งแล้วสั่งซ่อน
+            self.hide_window()
+
         return True
 
     def ensure_connection(self):
@@ -51,9 +108,23 @@ class MT5Client:
                 self.tg.send_message("⚠️ <b>MT5 Connection Lost!</b>\nสัญญาณอินเทอร์เน็ตหรือการเชื่อมต่อโบรกเกอร์หลุด กำลัง Reconnect อัตโนมัติ...")
             self.connect()
 
+    def ensure_symbol_selected(self, symbol: str) -> bool:
+        """เปิดการรับข้อมูลราคาของคู่เงินใน Market Watch (ไม่ต้องเปิดหน้าต่างกราฟใน MT5 GUI)"""
+        self.ensure_connection()
+        selected = mt5.symbol_select(symbol, True)
+        if not selected:
+            logger.warning(f"Failed to select symbol {symbol} in MT5 Market Watch")
+        return selected
+
+    def subscribe_symbols(self, symbols: list):
+        """เปิดรับข้อมูลราคาของคู่เงินทั้งหมดที่ตั้งค่าไว้"""
+        for sym in symbols:
+            if self.ensure_symbol_selected(sym):
+                logger.info(f"Background subscription active for symbol: {sym}")
+
     def get_rates(self, symbol, timeframe, num_bars):
         """ดึงข้อมูลราคา (OHLCV) กลับมาเป็น Pandas DataFrame"""
-        self.ensure_connection()
+        self.ensure_symbol_selected(symbol)
         
         tf_map = {
             "M1": mt5.TIMEFRAME_M1,
@@ -74,7 +145,7 @@ class MT5Client:
 
     def get_tick(self, symbol):
         """ดึงราคาปัจจุบัน (Bid/Ask)"""
-        self.ensure_connection()
+        self.ensure_symbol_selected(symbol)
         tick = mt5.symbol_info_tick(symbol)
         if tick is None:
             logger.error(f"Failed to get tick for {symbol}")
@@ -83,8 +154,7 @@ class MT5Client:
 
     def get_symbol_info(self, symbol):
         """ดึงข้อมูลเชิงลึกของคู่เงิน"""
-        self.ensure_connection()
-        mt5.symbol_select(symbol, True)
+        self.ensure_symbol_selected(symbol)
         info = mt5.symbol_info(symbol)
         if info is None:
             logger.error(f"Failed to get symbol info for {symbol}")

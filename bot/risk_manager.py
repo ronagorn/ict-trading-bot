@@ -117,9 +117,9 @@ class RiskManager:
 
     def check_daily_drawdown(self, initial_balance, current_equity):
         """
-        เช็คว่า Equity ปัจจุบันลดลงเกิน Daily Drawdown Limit หรือไม่
+        เช็คว่า Equity ปัจจุบันลดลงเกิน Daily Drawdown Limit หรือไม่ (default: 3.0%)
         """
-        limit_percent = self.config.get("daily_drawdown_limit_percent", 8.0)
+        limit_percent = self.config.get("daily_drawdown_limit_percent", 3.0)
         
         if current_equity >= initial_balance:
             return True
@@ -131,3 +131,74 @@ class RiskManager:
             return False
             
         return True
+
+    def manage_auto_breakeven(self, mt5_client, tg=None):
+        """
+        ระบบ Auto-Breakeven: เมื่อกำไรถึง 0.8-1.0 R:R
+        จะขยับ Stop Loss มาอยู่ที่จุด Entry Price เพื่อให้เป็นออเดอร์ไร้ความเสี่ยง 100%
+        """
+        import MetaTrader5 as mt5
+        positions = mt5.positions_get()
+        if not positions:
+            return
+
+        for pos in positions:
+            try:
+                entry = pos.price_open
+                current_sl = pos.sl
+                tp = pos.tp
+                symbol = pos.symbol
+                ticket = pos.ticket
+                pos_type = pos.type  # 0 = BUY, 1 = SELL
+
+                sym_info = mt5_client.get_symbol_info(symbol)
+                if not sym_info:
+                    continue
+
+                point = sym_info.point
+                tick = mt5_client.get_tick(symbol)
+                if not tick:
+                    continue
+
+                risk = abs(entry - current_sl) if current_sl > 0 else 0
+                if risk == 0:
+                    continue
+
+                # BUY Order
+                if pos_type == 0:
+                    current_price = tick.bid
+                    profit_dist = current_price - entry
+                    if profit_dist >= (risk * 0.8) and (current_sl < entry or current_sl == 0):
+                        new_sl = entry + (10 * point)
+                        req = {
+                            "action": mt5.TRADE_ACTION_SLTP,
+                            "position": ticket,
+                            "sl": float(new_sl),
+                            "tp": float(tp)
+                        }
+                        res = mt5.order_send(req)
+                        if res and res.retcode == mt5.TRADE_RETCODE_DONE:
+                            logger.info(f"Auto-Breakeven activated for BUY #{ticket} {symbol} SL moved to {new_sl:.2f}")
+                            if tg:
+                                tg.send_message(f"🛡️ <b>Auto-Breakeven Activated!</b>\nออเดอร์ #{ticket} ({symbol} BUY) กำไรถึงเป้าหมายแรกแล้ว ระบบได้ขยับ SL มาล็อคทุนที่ {new_sl:.2f} การันตีไร้ความเสี่ยง 100%")
+
+                # SELL Order
+                elif pos_type == 1:
+                    current_price = tick.ask
+                    profit_dist = entry - current_price
+                    if profit_dist >= (risk * 0.8) and (current_sl > entry or current_sl == 0):
+                        new_sl = entry - (10 * point)
+                        req = {
+                            "action": mt5.TRADE_ACTION_SLTP,
+                            "position": ticket,
+                            "sl": float(new_sl),
+                            "tp": float(tp)
+                        }
+                        res = mt5.order_send(req)
+                        if res and res.retcode == mt5.TRADE_RETCODE_DONE:
+                            logger.info(f"Auto-Breakeven activated for SELL #{ticket} {symbol} SL moved to {new_sl:.2f}")
+                            if tg:
+                                tg.send_message(f"🛡️ <b>Auto-Breakeven Activated!</b>\nออเดอร์ #{ticket} ({symbol} SELL) กำไรถึงเป้าหมายแรกแล้ว ระบบได้ขยับ SL มาล็อคทุนที่ {new_sl:.2f} การันตีไร้ความเสี่ยง 100%")
+            except Exception as e:
+                logger.error(f"Error managing auto-breakeven for ticket #{pos.ticket}: {e}")
+

@@ -1,30 +1,46 @@
 {
   "symbols": [
     "GOLD#",
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "AUDUSD",
+    "USDCAD",
+    "USDCHF",
+    "NZDUSD",
+    "EURGBP",
     "BTCUSD#",
-    "EURUSD#",
-    "GBPUSD#",
-    "USDJPY#",
-    "USDCAD#",
-    "EURGBP#",
-    "GBPJPY#"
+    "ETHUSD#",
+    "XRPUSD#"
   ],
   "risk_per_trade_percent": 1.0,
-  "daily_drawdown_limit_percent": 8.0,
+  "daily_drawdown_limit_percent": 3.0,
+  "auto_breakeven_trigger_rr": 1.0,
+  "news_filter_enabled": true,
   "max_orders_per_symbol": 2,
   "max_total_open_orders": 4,
   "max_same_currency_exposure": 2,
   "max_trades_per_day": 30,
   "min_rr_ratio": 1.5,
   "max_spread_points": {
-    "GOLD#": 300,
-    "BTCUSD#": 5000,
+    "GOLD#": 350,
+    "BTCUSD#": 100000,
     "EURUSD#": 100,
     "GBPUSD#": 100,
     "USDJPY#": 100,
     "USDCAD#": 100,
     "EURGBP#": 100,
-    "GBPJPY#": 150
+    "GBPJPY#": 150,
+    "EURUSD": 250,
+    "GBPUSD": 500,
+    "USDJPY": 350,
+    "AUDUSD": 500,
+    "USDCAD": 500,
+    "USDCHF": 350,
+    "NZDUSD": 500,
+    "EURGBP": 500,
+    "ETHUSD#": 30000,
+    "XRPUSD#": 30000
   },
   "killzones_ny_time": {
     "london": {
@@ -40,5 +56,91 @@
   },
   "ai_rules": {
     "disable_underperforming_sessions": false
+  },
+  "optimized_strategy_presets": {
+    "GOLD#": {
+      "timeframe": "M15",
+      "rr_ratio": 1.5,
+      "fvg_atr_mult": 0.2,
+      "win_rate_pct": 45.71,
+      "profit_factor": 1.5
+    },
+    "EURUSD": {
+      "timeframe": "M5",
+      "rr_ratio": 3.0,
+      "fvg_atr_mult": 0.2,
+      "win_rate_pct": 8.11,
+      "profit_factor": 1.05
+    },
+    "GBPUSD": {
+      "timeframe": "M15",
+      "rr_ratio": 5.0,
+      "fvg_atr_mult": 0.2,
+      "win_rate_pct": 18.18,
+      "profit_factor": 1.27
+    },
+    "USDJPY": {
+      "timeframe": "M15",
+      "rr_ratio": 10.0,
+      "fvg_atr_mult": 0.5,
+      "win_rate_pct": 25.0,
+      "profit_factor": 2.74
+    },
+    "AUDUSD": {
+      "timeframe": "M5",
+      "rr_ratio": 3.0,
+      "fvg_atr_mult": 0.2,
+      "win_rate_pct": 5.88,
+      "profit_factor": 1.02
+    },
+    "USDCAD": {
+      "timeframe": "M5",
+      "rr_ratio": 8.0,
+      "fvg_atr_mult": 0.3,
+      "win_rate_pct": 16.67,
+      "profit_factor": 1.52
+    },
+    "USDCHF": {
+      "timeframe": "M15",
+      "rr_ratio": 5.0,
+      "fvg_atr_mult": 0.2,
+      "win_rate_pct": 28.57,
+      "profit_factor": 1.78
+    },
+    "NZDUSD": {
+      "timeframe": "M5",
+      "rr_ratio": 10.0,
+      "fvg_atr_mult": 0.5,
+      "win_rate_pct": 17.65,
+      "profit_factor": 1.84
+    },
+    "EURGBP": {
+      "timeframe": "M15",
+      "rr_ratio": 5.0,
+      "fvg_atr_mult": 0.2,
+      "win_rate_pct": 18.18,
+      "profit_factor": 1.10
+    },
+    "BTCUSD#": {
+      "timeframe": "M5",
+      "rr_ratio": 5.0,
+      "fvg_atr_mult": 0.3,
+      "win_rate_pct": 25.93,
+      "profit_factor": 1.85
+    },
+    "ETHUSD#": {
+      "timeframe": "M5",
+      "rr_ratio": 8.0,
+      "fvg_atr_mult": 0.2,
+      "win_rate_pct": 25.0,
+      "profit_factor": 2.13
+    },
+    "XRPUSD#": {
+      "timeframe": "M15",
+      "rr_ratio": 2.0,
+      "fvg_atr_mult": 0.2,
+      "win_rate_pct": 51.43,
+      "profit_factor": 2.37
+    }
   }
 }

@@ -53,17 +53,45 @@ class ICTStrategy:
                     
         return m15_trend
 
-    def find_super_trader_setup(self, symbol, trend):
+    def get_htf_premium_discount_zone(self, symbol, df_h4=None):
         """
-        อัลกอริทึม Super Trader AI Engine (High-Frequency FVG + HTF Shield)
+        คำนวณโซน Premium / Discount ระดับ HTF 4H (50% Fibonacci Equilibrium):
+        - DISCOUNT (< 50% Equilibrium): โซนของถูก -> เหมาะสำหรับ BUY เท่านั้น
+        - PREMIUM (> 50% Equilibrium): โซนของแพง -> เหมาะสำหรับ SELL เท่านั้น
+        """
+        try:
+            if df_h4 is None or df_h4.empty:
+                df_h4 = self.mt5.get_rates(symbol, "H4", 60)
+            if df_h4 is None or df_h4.empty:
+                return "NEUTRAL"
+                
+            h4_high = df_h4['high'].tail(30).max()
+            h4_low = df_h4['low'].tail(30).min()
+            h4_range = h4_high - h4_low
+            
+            if h4_range <= 0:
+                return "NEUTRAL"
+                
+            equilibrium = h4_low + (h4_range * 0.5)
+            c_close = df_h4['close'].iloc[-1]
+            
+            return "DISCOUNT" if c_close < equilibrium else "PREMIUM"
+        except Exception as e:
+            logger.error(f"Error calculating HTF Premium/Discount zone for {symbol}: {e}")
+            return "NEUTRAL"
+
+    def find_super_trader_setup(self, symbol, trend, df_m15=None, df_h4=None):
+        """
+        อัลกอริทึม Super Trader AI Engine V2 (High-WinRate FVG + HTF Premium/Discount Zone Confluence)
         """
         if trend == "NEUTRAL":
             return None
             
-        df = self.mt5.get_rates(symbol, "M15", 250)
+        df = df_m15 if df_m15 is not None and not df_m15.empty else self.mt5.get_rates(symbol, "M15", 250)
         if df is None or df.empty:
             return None
             
+        df = df.copy()
         df.rename(columns={'tick_volume': 'volume'}, inplace=True)
         df['ema200'] = df['close'].ewm(span=200).mean()
         df['atr'] = self.calculate_atr(df, 14)
@@ -92,47 +120,54 @@ class ICTStrategy:
             current_close = df['close'].iloc[-1]
             ema200 = df['ema200'].iloc[-1]
             
-            # กรองเฉพาะ FVG ชัดเจน (>= 0.3 * ATR)
-            if fvg_size < (current_atr * 0.3):
+            # ตรวจสอบ HTF Premium / Discount Zone
+            htf_zone = self.get_htf_premium_discount_zone(symbol, df_h4=df_h4)
+            
+            # กรองเฉพาะ FVG ชัดเจน (>= 0.25 * ATR)
+            if fvg_size < (current_atr * 0.25):
                 return None
                 
-            # BULLISH SCALP
+            # BULLISH SCALP: ต้องเป็นเทรนด์ BULLISH + FVG BULLISH + ราคาปิดเหนือ EMA200 + อยู่ใน DISCOUNT ZONE (< 50% EQ)
             if trend == "BULLISH" and fvg_dir == 1 and current_close > ema200:
-                if current_low <= fvg_top and current_high >= fvg_bot:
-                    entry = fvg_top if current_open > fvg_top else current_open
-                    sl = fvg_bot - (current_atr * 0.8)
-                    risk = abs(entry - sl)
-                    if risk == 0: return None
-                    tp = entry + (risk * 1.5)
-                    
-                    return {
-                        "type": "BUY",
-                        "source": "Super Trader FVG Scalper",
-                        "entry": entry,
-                        "sl": sl,
-                        "tp": tp,
-                        "tp1": tp,
-                        "fvg_size": fvg_size
-                    }
+                if htf_zone in ["DISCOUNT", "NEUTRAL"]:
+                    if current_low <= fvg_top and current_high >= fvg_bot:
+                        entry = fvg_top if current_open > fvg_top else current_open
+                        sl = fvg_bot - (current_atr * 0.8)
+                        risk = abs(entry - sl)
+                        if risk == 0: return None
+                        tp = entry + (risk * 2.0)
+                        
+                        return {
+                            "type": "BUY",
+                            "source": "Super Trader HTF Discount FVG Confluence",
+                            "entry": entry,
+                            "sl": sl,
+                            "tp": tp,
+                            "tp1": tp,
+                            "fvg_size": fvg_size,
+                            "htf_zone": htf_zone
+                        }
 
-            # BEARISH SCALP
+            # BEARISH SCALP: ต้องเป็นเทรนด์ BEARISH + FVG BEARISH + ราคาปิดใต้ EMA200 + อยู่ใน PREMIUM ZONE (> 50% EQ)
             elif trend == "BEARISH" and fvg_dir == -1 and current_close < ema200:
-                if current_high >= fvg_bot and current_low <= fvg_top:
-                    entry = fvg_bot if current_open < fvg_bot else current_open
-                    sl = fvg_top + (current_atr * 0.8)
-                    risk = abs(sl - entry)
-                    if risk == 0: return None
-                    tp = entry - (risk * 1.5)
-                    
-                    return {
-                        "type": "SELL",
-                        "source": "Super Trader FVG Scalper",
-                        "entry": entry,
-                        "sl": sl,
-                        "tp": tp,
-                        "tp1": tp,
-                        "fvg_size": fvg_size
-                    }
+                if htf_zone in ["PREMIUM", "NEUTRAL"]:
+                    if current_high >= fvg_bot and current_low <= fvg_top:
+                        entry = fvg_bot if current_open < fvg_bot else current_open
+                        sl = fvg_top + (current_atr * 0.8)
+                        risk = abs(sl - entry)
+                        if risk == 0: return None
+                        tp = entry - (risk * 2.0)
+                        
+                        return {
+                            "type": "SELL",
+                            "source": "Super Trader HTF Premium FVG Confluence",
+                            "entry": entry,
+                            "sl": sl,
+                            "tp": tp,
+                            "tp1": tp,
+                            "fvg_size": fvg_size,
+                            "htf_zone": htf_zone
+                        }
                     
             return None
             
@@ -142,3 +177,4 @@ class ICTStrategy:
 
     def is_in_killzone(self):
         return True, "ALL_DAY_SCALPING"
+

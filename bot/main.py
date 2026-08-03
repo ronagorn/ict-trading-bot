@@ -1,17 +1,38 @@
+import sys
+import os
+
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
 import json
 import time
-import os
+import gc
+import socket
 import MetaTrader5 as mt5
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import pytz
 
 from bot.mt5_client import MT5Client
 from bot.strategy import ICTStrategy
 from bot.risk_manager import RiskManager
+from bot.news_filter import NewsFilter
 from bot.logger import logger
 from services.db_client import SupabaseClient
 from services.telegram_bot import TelegramNotifier
 from services.ai_analyzer import AIAnalyzer
+
+def ensure_single_instance():
+    """ป้องกันการเปิดบอทซ้ำหลายหน้าต่าง (Single Instance Guard)"""
+    try:
+        lock_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        lock_socket.bind(('127.0.0.1', 47382))
+        return lock_socket
+    except OSError:
+        logger.warning("Another instance of AURA Trading Bot is already running!")
+        print("⚠️ AURA Trading Bot is already running! (ระบบบอทเปิดทำงานอยู่แล้ว ไม่เปิดซ้ำ)")
+        sys.exit(0)
 
 def load_config():
     config_path = os.path.join(os.path.dirname(__file__), 'config.json')
@@ -37,8 +58,8 @@ def check_closed_trades(open_tickets: set, tg: TelegramNotifier, db) -> set:
 
     for ticket in closed_tickets:
         try:
-            # ดึงประวัติออเดอร์ที่ปิดแล้วจาก MT5
-            from_time = datetime(2020, 1, 1, tzinfo=timezone.utc)
+            # ดึงประวัติออเดอร์ที่ปิดแล้วจาก MT5 (เฉพาะ 7 วันล่าสุด เพื่อประหยัด CPU/RAM)
+            from_time = datetime.now(timezone.utc) - timedelta(days=7)
             to_time = datetime.now(timezone.utc)
             deals = mt5.history_deals_get(from_time, to_time)
 
@@ -107,6 +128,7 @@ def check_closed_trades(open_tickets: set, tg: TelegramNotifier, db) -> set:
 
 
 def main():
+    instance_lock = ensure_single_instance()
     logger.info("Initializing Institutional ICT Trading Bot...")
     config = load_config()
     tg = TelegramNotifier()
@@ -124,8 +146,10 @@ def main():
     risk_manager = RiskManager(config)
     
     symbols = config.get("symbols", ["GOLD#", "BTCUSD#"])
+    mt5_client.subscribe_symbols(symbols)
     max_trades = config.get("max_trades_per_day", 30)
     daily_trades_count = 0
+    loop_counter = 0
     current_date = datetime.now().date()
     last_heartbeat_hour = -1
 
@@ -311,6 +335,11 @@ def main():
                         msg += f"<b>TP (1:1.5 Target):</b> {tp_target:.2f}\n"
                         msg += f"<b>Lot Size:</b> {lot_size}\n"
                         tg.send_message(msg)
+
+            # เคลียร์ memory ทุกๆ 30 ลูป (ประมาณ 5 นาที)
+            loop_counter += 1
+            if loop_counter % 30 == 0:
+                gc.collect()
 
             # หน่วงเวลาลูป (10 วิเพื่อสแกน + ตรวจออเดอร์ที่ปิด)
             time.sleep(10)
