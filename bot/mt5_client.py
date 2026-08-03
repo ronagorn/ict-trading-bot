@@ -20,34 +20,61 @@ class MT5Client:
         self.tg = tg
 
     def hide_window(self):
-        """ซ่อนหน้าต่าง XM MT5 และซ่อนไอคอนจาก Taskbar ด้านล่างทั้งหมด (SW_HIDE)"""
+        """ซ่อนหน้าต่าง XM MT5 และซ่อนไอคอนจาก Taskbar ด้านล่างทั้งหมด (SW_HIDE + WS_EX_TOOLWINDOW)"""
         try:
-            info = mt5.terminal_info()
-            if not info:
+            import subprocess
+            target_pids = set()
+            try:
+                info = mt5.terminal_info()
+                if info:
+                    pid = getattr(info, 'pid', getattr(info, 'process_id', None))
+                    if pid: target_pids.add(pid)
+            except Exception:
+                pass
+
+            try:
+                out = subprocess.check_output('tasklist /FI "IMAGENAME eq terminal64.exe" /FO CSV /NH', shell=True, text=True)
+                for line in out.strip().splitlines():
+                    parts = line.split('","')
+                    if len(parts) >= 2:
+                        try:
+                            target_pids.add(int(parts[1].replace('"', '')))
+                        except ValueError:
+                            pass
+            except Exception:
+                pass
+
+            if not target_pids:
                 return False
-            target_pid = getattr(info, 'pid', getattr(info, 'process_id', None))
-            if not target_pid:
-                return False
-            
+
             user32 = ctypes.windll.user32
-            EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_int, ctypes.c_int)
+            GWL_EXSTYLE = -20
+            WS_EX_APPWINDOW = 0x00040000
+            WS_EX_TOOLWINDOW = 0x00000080
             
+            EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_int, ctypes.c_int)
             found_count = [0]
+
             def foreach_window(hwnd, lparam):
                 pid = ctypes.c_ulong()
                 user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
-                if pid.value == target_pid and user32.IsWindowVisible(hwnd):
-                    user32.ShowWindow(hwnd, 0)  # 0 = SW_HIDE (ซ่อนหน้าต่างและ Taskbar)
+                if pid.value in target_pids:
+                    # ปรับแต่ง Window Extended Style เพื่อลบไอคอนออกจาก Taskbar ด้านล่างโดยตรง
+                    ex_style = user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
+                    new_ex_style = (ex_style & ~WS_EX_APPWINDOW) | WS_EX_TOOLWINDOW
+                    user32.SetWindowLongW(hwnd, GWL_EXSTYLE, new_ex_style)
+                    # ซ่อนหน้าต่าง
+                    user32.ShowWindow(hwnd, 0)  # 0 = SW_HIDE
                     found_count[0] += 1
                 return True
 
             user32.EnumWindows(EnumWindowsProc(foreach_window), 0)
             if found_count[0] > 0:
-                logger.info(f"XM MT5 Terminal window hidden (SW_HIDE, target_pid={target_pid}).")
+                logger.info(f"XM MT5 Terminal window & Taskbar icon hidden (PIDs: {target_pids}).")
                 return True
             return False
         except Exception as e:
-            logger.warning(f"Could not hide MT5 window: {e}")
+            logger.warning(f"Could not hide MT5 window/Taskbar: {e}")
             return False
 
     def show_window(self):
