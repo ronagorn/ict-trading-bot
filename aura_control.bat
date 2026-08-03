@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 title AURA Super Trader - Control Center
 cd /d "%~dp0"
 
@@ -11,11 +12,11 @@ echo.
 echo   [1] Start Bot in Background - Run Hidden
 echo   [2] Check Bot Status and Memory
 echo   [3] Stop Background Bot
-echo   [4] Start Bot in Console Mode (เปิดหน้าต่างดำตรวจงาน)
+echo   [4] Start Bot in Console Mode (เปิดหน้าต่างดำสแกนกราฟสด)
 echo   [5] Open Web Dashboard
 echo   [6] Restart Bot and XM MT5 (Re-open fresh)
-echo   [7] Show / Unhide XM MT5 Window (ดึงหน้าต่าง MT5 กลับขึ้นมา)
-echo   [8] Hide XM MT5 Window (ซ่อนหน้าต่าง MT5 ลงฉากหลัง)
+echo   [7] Show / Unhide XM MT5 Window (แสดงหน้าต่าง XM MT5)
+echo   [8] Hide XM MT5 Window (ซ่อนหน้าต่าง XM MT5 ลงฉากหลัง)
 echo   [0] Exit
 echo.
 echo ============================================================

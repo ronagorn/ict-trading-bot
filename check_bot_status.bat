@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 setlocal
 echo ============================================================
 echo   AURA TRADING BOT - System Status Check
