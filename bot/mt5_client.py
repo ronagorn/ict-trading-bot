@@ -80,18 +80,44 @@ class MT5Client:
     def show_window(self):
         """แสดงหน้าต่าง XM MT5 กลับขึ้นมาบน Taskbar"""
         try:
-            info = mt5.terminal_info()
-            if not info:
+            import subprocess
+            target_pids = set()
+            try:
+                info = mt5.terminal_info()
+                if info:
+                    pid = getattr(info, 'pid', getattr(info, 'process_id', None))
+                    if pid: target_pids.add(pid)
+            except Exception:
+                pass
+
+            try:
+                out = subprocess.check_output('tasklist /FI "IMAGENAME eq terminal64.exe" /FO CSV /NH', shell=True, text=True)
+                for line in out.strip().splitlines():
+                    parts = line.split('","')
+                    if len(parts) >= 2:
+                        try:
+                            target_pids.add(int(parts[1].replace('"', '')))
+                        except ValueError:
+                            pass
+            except Exception:
+                pass
+
+            if not target_pids:
                 return False
-            target_pid = getattr(info, 'pid', getattr(info, 'process_id', None))
-            
+
             user32 = ctypes.windll.user32
-            EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_int, ctypes.c_int)
+            GWL_EXSTYLE = -20
+            WS_EX_APPWINDOW = 0x00040000
+            WS_EX_TOOLWINDOW = 0x00000080
             
+            EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_int, ctypes.c_int)
             def foreach_window(hwnd, lparam):
                 pid = ctypes.c_ulong()
                 user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
-                if pid.value == target_pid:
+                if pid.value in target_pids:
+                    ex_style = user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
+                    new_ex_style = (ex_style & ~WS_EX_TOOLWINDOW) | WS_EX_APPWINDOW
+                    user32.SetWindowLongW(hwnd, GWL_EXSTYLE, new_ex_style)
                     user32.ShowWindow(hwnd, 5)  # 5 = SW_SHOW
                 return True
 
