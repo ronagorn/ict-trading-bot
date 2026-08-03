@@ -26,20 +26,26 @@ class MT5Client:
             if not info:
                 return False
             target_pid = getattr(info, 'pid', getattr(info, 'process_id', None))
+            if not target_pid:
+                return False
             
             user32 = ctypes.windll.user32
             EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_int, ctypes.c_int)
             
+            found_count = [0]
             def foreach_window(hwnd, lparam):
                 pid = ctypes.c_ulong()
                 user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
-                if pid.value == target_pid:
+                if pid.value == target_pid and user32.IsWindowVisible(hwnd):
                     user32.ShowWindow(hwnd, 0)  # 0 = SW_HIDE (ซ่อนหน้าต่างและ Taskbar)
+                    found_count[0] += 1
                 return True
 
             user32.EnumWindows(EnumWindowsProc(foreach_window), 0)
-            logger.info("XM MT5 Terminal window hidden from Taskbar.")
-            return True
+            if found_count[0] > 0:
+                logger.info(f"XM MT5 Terminal window hidden (SW_HIDE, target_pid={target_pid}).")
+                return True
+            return False
         except Exception as e:
             logger.warning(f"Could not hide MT5 window: {e}")
             return False
@@ -93,10 +99,15 @@ class MT5Client:
         logger.info(f"Connected to MT5 Server: {self.server} (Account: {self.login})")
         self.connected = True
 
-        # ซ่อนหน้าต่าง XM MT5 จาก Taskbar เฉพาะเมื่อตั้งค่า HIDE_MT5=1 ใน .env
+        # ซ่อนหน้าต่าง XM MT5 จาก Taskbar แบบอัตโนมัติเมื่อตั้งค่า HIDE_MT5=1 ใน .env
         if os.getenv("HIDE_MT5", "0") == "1":
-            time.sleep(1) # รอโปรแกรมขึ้นแป๊บหนึ่งแล้วสั่งซ่อน
-            self.hide_window()
+            import threading
+            def auto_hide_loop():
+                for _ in range(12):
+                    time.sleep(0.5)
+                    if self.hide_window():
+                        break
+            threading.Thread(target=auto_hide_loop, daemon=True).start()
 
         return True
 
