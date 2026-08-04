@@ -5,11 +5,13 @@ class RiskManager:
     def __init__(self, config):
         self.config = config
 
-    def calculate_lot_size(self, account_equity, symbol_info, entry_price, stop_loss_price):
+    def calculate_lot_size(self, account_equity, symbol_info, entry_price, stop_loss_price, risk_percent=None):
         """
         คำนวณ Lot size เพื่อจำกัดความเสี่ยงไม่เกิน X% ของพอร์ต
+        risk_percent: optional override (from setup config)
         """
-        risk_percent = self.config.get("risk_per_trade_percent", 1.0)
+        if risk_percent is None:
+            risk_percent = self.config.get("risk_per_trade_percent", 1.0)
         risk_amount = account_equity * (risk_percent / 100.0)
         
         sl_distance = abs(entry_price - stop_loss_price)

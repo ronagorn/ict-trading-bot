@@ -145,7 +145,10 @@ def main():
     strategy = ICTStrategy(mt5_client, config)
     risk_manager = RiskManager(config)
     
+    aura_cfg = config.get("aura_ultimate", {})
     symbols = config.get("symbols", ["GOLD#", "BTCUSD#"])
+    if aura_cfg.get("whitelist_only", False):
+        symbols = [s for s in symbols if s in aura_cfg.get("whitelist_symbols", symbols)]
     mt5_client.subscribe_symbols(symbols)
     max_trades = config.get("max_trades_per_day", 30)
     daily_trades_count = 0
@@ -304,7 +307,8 @@ def main():
                     if not sym_info:
                         continue
                         
-                    lot_size = risk_manager.calculate_lot_size(acc_info.equity, sym_info, setup['entry'], setup['sl'])
+                    risk_pct = aura_cfg.get("risk_percent")
+                    lot_size = risk_manager.calculate_lot_size(acc_info.equity, sym_info, setup['entry'], setup['sl'], risk_percent=risk_pct)
                     if lot_size <= 0:
                         logger.warning(f"Calculated lot size is 0 for {symbol}")
                         continue
@@ -325,16 +329,17 @@ def main():
                             setup['sl'], tp_target, lot_size, setup.get('fvg_size', 0), session_name
                         )
                         
-                        # แจ้งเตือน Telegram (Entry)
-                        msg = f"💥 <b>ENTRY SIGNAL EXECUTED [{setup['source']}]</b>\n\n"
-                        msg += f"<b>Ticket:</b> #{ticket}\n"
-                        msg += f"<b>Symbol:</b> {symbol}\n"
-                        msg += f"<b>Type:</b> {setup['type']}\n"
-                        msg += f"<b>Entry:</b> {setup['entry']:.2f}\n"
-                        msg += f"<b>SL:</b> {setup['sl']:.2f}\n"
-                        msg += f"<b>TP (1:1.5 Target):</b> {tp_target:.2f}\n"
-                        msg += f"<b>Lot Size:</b> {lot_size}\n"
-                        tg.send_message(msg)
+                    # แจ้งเตือน Telegram (Entry)
+                    sniper_badge = " SNIPER" if setup.get("is_sniper") else ""
+                    msg = f"💥 <b>ENTRY SIGNAL EXECUTED [{setup['source']}{sniper_badge}]</b>\n\n"
+                    msg += f"<b>Ticket:</b> #{ticket}\n"
+                    msg += f"<b>Symbol:</b> {symbol}\n"
+                    msg += f"<b>Type:</b> {setup['type']}\n"
+                    msg += f"<b>Entry:</b> {setup['entry']:.2f}\n"
+                    msg += f"<b>SL:</b> {setup['sl']:.2f}\n"
+                    msg += f"<b>TP:</b> {tp_target:.2f}\n"
+                    msg += f"<b>Lot Size:</b> {lot_size}\n"
+                    tg.send_message(msg)
 
             # เคลียร์ memory ทุกๆ 30 ลูป (ประมาณ 5 นาที)
             loop_counter += 1

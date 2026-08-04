@@ -57,6 +57,17 @@
   "ai_rules": {
     "disable_underperforming_sessions": false
   },
+  "aura_ultimate": {
+    "sniper_mode_enabled": true,
+    "fvg_atr_mult": 0.5,
+    "ob_lookback": 20,
+    "sniper_rr": 3.5,
+    "base_rr": 2.5,
+    "use_4h_shield": true,
+    "directional_fvg_filter": true,
+    "whitelist_only": true,
+    "whitelist_symbols": ["EURUSD", "BTCUSD#", "ETHUSD#", "XRPUSD#"]
+  },
   "optimized_strategy_presets": {
     "GOLD#": {
       "timeframe": "M15",

@@ -130,10 +130,13 @@ class MT5Client:
     def connect(self):
         """เชื่อมต่อกับ MetaTrader 5 Terminal (เปิดโปรแกรมและ Login อัตโนมัติในคลิกเดียว)"""
         init_success = False
-        if os.path.exists(self.mt5_path):
+        if self.login and self.password and self.server and os.path.exists(self.mt5_path):
             logger.info(f"Auto-launching XM MT5 Terminal: {self.mt5_path}")
             init_success = mt5.initialize(path=self.mt5_path, login=self.login, password=self.password, server=self.server)
+        elif self.login and self.password and self.server:
+            init_success = mt5.initialize(login=self.login, password=self.password, server=self.server)
         else:
+            logger.info("No MT5 credentials in .env — using already-running terminal")
             init_success = mt5.initialize()
             
         if not init_success:
@@ -142,12 +145,13 @@ class MT5Client:
                 self.tg.send_message("⚠️ <b>MT5 Connection Warning:</b> ไม่สามารถเปิดโปรแกรม XM MT5 ได้")
             return False
 
-        if not mt5.login(self.login, self.password, self.server):
-            logger.error(f"MT5 login failed, error code: {mt5.last_error()}")
-            if self.tg:
-                self.tg.send_message("⚠️ <b>MT5 Login Warning:</b> ล็อกอินเข้า XM MT5 ไม่สำเร็จ กรุณาเช็คพาสเวิร์ด")
-            mt5.shutdown()
-            return False
+        if self.login and self.password and self.server:
+            if not mt5.login(self.login, self.password, self.server):
+                logger.error(f"MT5 login failed, error code: {mt5.last_error()}")
+                if self.tg:
+                    self.tg.send_message("⚠️ <b>MT5 Login Warning:</b> ล็อกอินเข้า XM MT5 ไม่สำเร็จ กรุณาเช็คพาสเวิร์ด")
+                mt5.shutdown()
+                return False
             
         logger.info(f"Connected to MT5 Server: {self.server} (Account: {self.login})")
         self.connected = True
@@ -192,6 +196,7 @@ class MT5Client:
         
         tf_map = {
             "M1": mt5.TIMEFRAME_M1,
+            "M5": mt5.TIMEFRAME_M5,
             "M15": mt5.TIMEFRAME_M15,
             "H1": mt5.TIMEFRAME_H1,
             "H4": mt5.TIMEFRAME_H4,

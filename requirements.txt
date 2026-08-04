@@ -1,12 +1,17 @@
+# Core
 MetaTrader5; sys_platform == 'win32'
-smartmoneyconcepts
+smartmoneyconcepts>=0.3.0
+pandas>=2.0
+numpy>=1.24
 pytz
-pandas
 python-dotenv
+
+# Services
 requests
 supabase
-python-telegram-bot
 google-generativeai
-plotly
+
+# Dashboard (optional)
 streamlit
+plotly
 pyarrow
