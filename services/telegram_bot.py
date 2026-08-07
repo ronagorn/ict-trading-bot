@@ -93,6 +93,23 @@ class TelegramNotifier:
         msg = f"🤖 <b>Gemini AI Insight</b>\n\n{suggestion_text}"
         self.send_message(msg, reply_markup=keyboard)
 
+    def send_ml_config_suggestion(self, suggestion_text):
+        """ส่งคำแนะนำจาก ML Optimizer พร้อมปุ่มอนุมัติ/ปฏิเสธ"""
+        keyboard = {
+            "inline_keyboard": [
+                [
+                    {"text": "✅ อนุมัติ ML Config", "callback_data": "ml_config_approve"},
+                    {"text": "❌ ปฏิเสธ", "callback_data": "ml_config_reject"},
+                ]
+            ]
+        }
+        self.send_message(suggestion_text, reply_markup=keyboard)
+
+    def set_ml_approval_callback(self, on_approve, on_reject):
+        """ตั้ง callback สำหรับ ML config approval"""
+        self._callbacks["ml_approve"] = on_approve
+        self._callbacks["ml_reject"] = on_reject
+
     # ----------------------------------------------------
     # TELEGRAM COMMAND LISTENER & INTENT HANDLER ENGINE
     # ----------------------------------------------------
@@ -284,6 +301,32 @@ class TelegramNotifier:
             self._execute_ai_summary_cmd(chat_id)
         elif data == "cmd_help":
             self._send_help_menu(chat_id)
+        elif data == "ml_config_approve":
+            if self._callbacks.get("ml_approve"):
+                try:
+                    self._callbacks["ml_approve"]()
+                    self.send_message(
+                        "✅ <b>อนุมัติ ML Config แล้ว</b>\nกำลังอัปเดต config.json...",
+                        chat_id=chat_id,
+                    )
+                except Exception as e:
+                    self.send_message(f"⚠️ ML apply error: {e}", chat_id=chat_id)
+            else:
+                self.send_message(
+                    "⚠️ ML approval handler ยังไม่ได้เชื่อมต่อ — รัน: python -m services.ml_optimizer --apply",
+                    chat_id=chat_id,
+                )
+        elif data == "ml_config_reject":
+            if self._callbacks.get("ml_reject"):
+                try:
+                    self._callbacks["ml_reject"]()
+                except Exception:
+                    pass
+            self.send_message("❌ <b>ปฏิเสธคำแนะนำ ML</b> — config ไม่มีการเปลี่ยนแปลง", chat_id=chat_id)
+        elif data == "update_config_yes":
+            self.send_message("ℹ️ ใช้ ML Optimizer สำหรับการอัปเดต config อัตโนมัติ", chat_id=chat_id)
+        elif data == "ignore_ai":
+            self.send_message("👌 เพิกเฉยคำแนะนำแล้ว", chat_id=chat_id)
 
     def _send_help_menu(self, chat_id: str):
         msg = (

@@ -216,11 +216,23 @@ def main():
     tg.set_callback("positions", get_positions_summary)
     tg.set_callback("ai_summary", get_ai_summary)
 
+    def on_ml_approve():
+        from services.ml_optimizer import MLOptimizer
+        opt = MLOptimizer()
+        opt.mark_approved()
+        opt.apply_approved_config()
+
+    def on_ml_reject():
+        from services.ml_optimizer import MLOptimizer
+        MLOptimizer().mark_rejected()
+
+    tg.set_ml_approval_callback(on_ml_approve, on_ml_reject)
+
     # เริ่มระบบ Telegram Command Listener (Background Thread)
     tg.start_polling()
 
     # แจ้งเตือนเมื่อบอทเริ่มทำงาน
-    tg.send_message("🚀 <b>AURA Super Trader Bot Started</b>\nพร้อมสแกนกราฟเทรดจริง GOLD# & BTCUSD# ( High-Frequency FVG Engine + 4H Shield )\n<i>คุณสามารถสั่งการหรือพิมพ์ถามผ่าน Telegram ได้แล้วครับ</i>")
+    tg.send_message("🚀 <b>AURA Super Trader Bot Started (v4.0 Order Flow)</b>\nพร้อมสแกน ICT Order Flow + Volume Imbalance\n<i>คุณสามารถสั่งการหรือพิมพ์ถามผ่าน Telegram ได้แล้วครับ</i>")
 
     try:
         while True:
@@ -326,7 +338,9 @@ def main():
                         # บันทึกฐานข้อมูล
                         db.log_trade(
                             ticket, symbol, setup['type'], datetime.now(), setup['entry'], 
-                            setup['sl'], tp_target, lot_size, setup.get('fvg_size', 0), session_name
+                            setup['sl'], tp_target, lot_size, setup.get('fvg_size', 0), session_name,
+                            volume_spike_multiplier=setup.get('volume_spike'),
+                            trend_strength=setup.get('trend_strength'),
                         )
                         
                     # แจ้งเตือน Telegram (Entry)

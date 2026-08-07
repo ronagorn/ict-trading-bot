@@ -13,7 +13,9 @@ CREATE TABLE trades (
   fvg_size DOUBLE PRECISION,
   session TEXT,
   profit_loss DOUBLE PRECISION DEFAULT 0.0,
-  status TEXT NOT NULL DEFAULT 'OPEN'
+  status TEXT NOT NULL DEFAULT 'OPEN',
+  volume_spike_multiplier DOUBLE PRECISION,
+  trend_strength DOUBLE PRECISION
 );
 
 -- สร้าง Index เพื่อให้ดึงข้อมูลได้เร็วขึ้นเมื่อใช้ AI หรือ Dashboard

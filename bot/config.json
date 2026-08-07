@@ -66,7 +66,13 @@
     "use_4h_shield": true,
     "directional_fvg_filter": true,
     "whitelist_only": true,
-    "whitelist_symbols": ["EURUSD", "BTCUSD#", "ETHUSD#", "XRPUSD#"]
+    "whitelist_symbols": ["EURUSD", "BTCUSD#", "ETHUSD#", "XRPUSD#"],
+    "volume_spike_mult": 1.5,
+    "volume_ma_period": 20,
+    "require_mss": true,
+    "require_liquidity_sweep": true,
+    "all_day_scalping": true,
+    "order_flow_only": true
   },
   "optimized_strategy_presets": {
     "GOLD#": {

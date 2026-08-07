@@ -13,7 +13,8 @@ class SupabaseClient:
             logger.warning("Supabase credentials not found. DB logging disabled.")
             self.enabled = False
 
-    def log_trade(self, ticket_id, symbol, trade_type, entry_time, entry_price, sl, tp, lot_size, fvg_size, session):
+    def log_trade(self, ticket_id, symbol, trade_type, entry_time, entry_price, sl, tp, lot_size, fvg_size, session,
+                  volume_spike_multiplier=None, trend_strength=None):
         """บันทึกออเดอร์ใหม่ลงฐานข้อมูล"""
         if not self.enabled: return False
         
@@ -31,6 +32,10 @@ class SupabaseClient:
             "status": "OPEN",
             "profit_loss": 0.0
         }
+        if volume_spike_multiplier is not None:
+            data["volume_spike_multiplier"] = volume_spike_multiplier
+        if trend_strength is not None:
+            data["trend_strength"] = trend_strength
         
         try:
             self.client.table("trades").insert(data).execute()
@@ -69,4 +74,23 @@ class SupabaseClient:
             return response.data
         except Exception as e:
             logger.error(f"Failed to fetch losing trades: {e}")
+            return []
+
+    def get_closed_trades_for_ml(self, limit=2000):
+        """ดึงประวัติเทรดที่ปิดแล้วทั้งหมดสำหรับ ML Optimizer"""
+        if not self.enabled:
+            return []
+
+        try:
+            response = (
+                self.client.table("trades")
+                .select("*")
+                .in_("status", ["WIN", "LOSS", "BREAKEVEN"])
+                .order("entry_time", desc=True)
+                .limit(limit)
+                .execute()
+            )
+            return response.data or []
+        except Exception as e:
+            logger.error(f"Failed to fetch closed trades for ML: {e}")
             return []
