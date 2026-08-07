@@ -1,6 +1,6 @@
 {
   "model_version": "5.0.0",
-  "training_timestamp": "2026-08-07T16:04:39.970259+00:00",
+  "training_timestamp": "2026-08-07T16:06:38.313545+00:00",
   "feature_schema_version": "v5.0_audited",
   "dataset_hash": "001b54aca28b1b92",
   "calibration_version": "Platt_Sigmoid_CV",
