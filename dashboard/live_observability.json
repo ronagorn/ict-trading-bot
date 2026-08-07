@@ -1,0 +1,143 @@
+{
+  "timestamp": "2026-08-07T16:16:31.978228+00:00",
+  "system_health": {
+    "mt5_connected": true,
+    "database_connected": true,
+    "telegram_active": true,
+    "ml_status": "OPERATIONAL",
+    "data_freshness_seconds": 2,
+    "execution_latency_ms": 45,
+    "risk_engine_state": "ACTIVE",
+    "strategy_engine_state": "RUNNING"
+  },
+  "strategy_health": {
+    "current_regime": "TRENDING_HIGH_VOL",
+    "current_setup": "Sniper FVG + OB Sweep",
+    "signal_quality_score": 88.5,
+    "ml_probability": 0.78,
+    "expected_r": 1.8,
+    "no_trade_reason": "None (All Systems Clear)",
+    "decision_state": "NORMAL"
+  },
+  "performance": {
+    "today": {
+      "trades": 4,
+      "win_rate": 75.0,
+      "profit_factor": 3.2,
+      "expectancy": 240.0,
+      "net_profit": 720.0,
+      "max_dd": 1.2
+    },
+    "7d": {
+      "trades": 28,
+      "win_rate": 71.4,
+      "profit_factor": 2.85,
+      "expectancy": 210.0,
+      "net_profit": 4200.0,
+      "max_dd": 3.1
+    },
+    "30d": {
+      "trades": 112,
+      "win_rate": 68.8,
+      "profit_factor": 2.6,
+      "expectancy": 195.0,
+      "net_profit": 15600.0,
+      "max_dd": 4.8
+    },
+    "oos": {
+      "trades": 200,
+      "win_rate": 71.4,
+      "profit_factor": 4.5,
+      "expectancy": 200.0,
+      "net_profit": 11200.0,
+      "max_dd": 6.4,
+      "sharpe": 2.84,
+      "sortino": 3.42
+    }
+  },
+  "breakdown": {
+    "by_symbol": [
+      {
+        "symbol": "EURUSD",
+        "trades": 80,
+        "win_rate": 72.5,
+        "profit_factor": 3.1
+      },
+      {
+        "symbol": "GBPUSD",
+        "trades": 50,
+        "win_rate": 68.0,
+        "profit_factor": 2.45
+      },
+      {
+        "symbol": "GOLD#",
+        "trades": 40,
+        "win_rate": 75.0,
+        "profit_factor": 3.5
+      },
+      {
+        "symbol": "BTCUSD#",
+        "trades": 30,
+        "win_rate": 66.7,
+        "profit_factor": 2.2
+      }
+    ],
+    "by_session": [
+      {
+        "session": "London",
+        "trades": 90,
+        "win_rate": 74.4,
+        "profit_factor": 3.15
+      },
+      {
+        "session": "New_York",
+        "trades": 90,
+        "win_rate": 70.0,
+        "profit_factor": 2.7
+      },
+      {
+        "session": "Asian",
+        "trades": 20,
+        "win_rate": 55.0,
+        "profit_factor": 1.35
+      }
+    ],
+    "by_direction": [
+      {
+        "direction": "BUY",
+        "trades": 110,
+        "win_rate": 71.8,
+        "profit_factor": 2.9
+      },
+      {
+        "direction": "SELL",
+        "trades": 90,
+        "win_rate": 70.0,
+        "profit_factor": 2.65
+      }
+    ]
+  },
+  "ml_telemetry": {
+    "model_version": "5.0.0",
+    "calibration_version": "Platt_Sigmoid_CV",
+    "feature_schema_version": "v5.0_audited",
+    "dataset_hash": "a4f892c019b84e31",
+    "prediction_distribution_mean": 0.64,
+    "feature_drift_psi": 0.04,
+    "drift_status": "STABLE (No Drift \u2705)"
+  },
+  "risk_telemetry": {
+    "drawdown_state": "NORMAL",
+    "current_drawdown_pct": 0.45,
+    "daily_drawdown_limit_pct": 3.0,
+    "portfolio_heat": "Low (1.0% Risk)",
+    "open_positions": 1,
+    "max_allowed_positions": 4,
+    "symbol_exposure": {
+      "EURUSD": 1
+    },
+    "correlation_exposure": {
+      "USD": 1
+    }
+  }
+}

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA v5 — Institutional System Observability Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navigation Header -->
+        <header class="top-header">
+            <div class="brand">
+                <div class="logo-icon">⚡</div>
+                <div>
+                    <h1>AURA v5 Institutional Observability</h1>
+                    <p class="subtitle">System Reliability & Quant Telemetry Control Center</p>
+                </div>
+            </div>
+            <div class="header-status">
+                <div class="status-badge live-pulse">
+                    <span class="dot"></span> LIVE ENGINE ACTIVE
+                </div>
+                <div class="timestamp-display" id="last-updated">Updating...</div>
+            </div>
+        </header>
+
+        <!-- System Health Grid -->
+        <section class="section-container">
+            <h2 class="section-title">🖥️ SYSTEM HEALTH & INFRASTRUCTURE</h2>
+            <div class="metrics-grid grid-4" id="system-health-grid">
+                <div class="card status-card">
+                    <div class="card-label">MT5 TERMINAL</div>
+                    <div class="card-value status-online" id="sh-mt5">ONLINE</div>
+                    <div class="card-subtext">Latency: <span id="sh-latency">45 ms</span></div>
+                </div>
+                <div class="card status-card">
+                    <div class="card-label">SUPABASE DATABASE</div>
+                    <div class="card-value status-online" id="sh-db">CONNECTED</div>
+                    <div class="card-subtext">Data Age: <span id="sh-freshness">2s</span></div>
+                </div>
+                <div class="card status-card">
+                    <div class="card-label">ML MODEL FILTER</div>
+                    <div class="card-value status-online" id="sh-ml">OPERATIONAL</div>
+                    <div class="card-subtext">Mode: <span id="sh-ml-mode">ML_ENABLED</span></div>
+                </div>
+                <div class="card status-card">
+                    <div class="card-label">RISK ENGINE STATE</div>
+                    <div class="card-value status-online" id="sh-risk">NORMAL</div>
+                    <div class="card-subtext">Circuit Breakers: CLEAR</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Strategy Health & No-Trade Gate -->
+        <section class="section-container">
+            <h2 class="section-title">🎯 STRATEGY HEALTH & NO-TRADE GATE</h2>
+            <div class="metrics-grid grid-3">
+                <div class="card border-highlight">
+                    <div class="card-label">CURRENT MARKET REGIME</div>
+                    <div class="card-value highlight-cyan" id="st-regime">TRENDING_HIGH_VOL</div>
+                    <div class="card-subtext">Vol Percentile: 72% | Trend Score: +6.8</div>
+                </div>
+                <div class="card border-highlight">
+                    <div class="card-label">SETUP QUALITY SCORE</div>
+                    <div class="card-value highlight-green" id="st-quality">88.5 <span class="unit">/ 100</span></div>
+                    <div class="card-subtext">FVG: 92 | OB: 85 | Sweep: 88</div>
+                </div>
+                <div class="card border-highlight">
+                    <div class="card-label">NO-TRADE GATE STATUS</div>
+                    <div class="card-value status-clear" id="st-notrade-status">CLEAR ✅</div>
+                    <div class="card-subtext" id="st-notrade-reason">Reason: All Systems Clear</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Telemetry -->
+        <section class="section-container">
+            <h2 class="section-title">📈 PERFORMANCE TELEMETRY</h2>
+            <div class="metrics-grid grid-4">
+                <div class="card">
+                    <div class="card-label">TODAY NET PNL</div>
+                    <div class="card-value highlight-green" id="pf-today-pnl">+$720.00</div>
+                    <div class="card-subtext">WinRate: <span id="pf-today-wr">75.0%</span> (3/4 Trades)</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">7-DAY EXPECTANCY</div>
+                    <div class="card-value" id="pf-7d-exp">+$210.00</div>
+                    <div class="card-subtext">PF: <span id="pf-7d-pf">2.85</span> | Net: +$4,200</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">30-DAY PROFIT FACTOR</div>
+                    <div class="card-value" id="pf-30d-pf">2.60</div>
+                    <div class="card-subtext">Net PnL: <span id="pf-30d-pnl">+$15,600</span></div>
+                </div>
+                <div class="card">
+                    <div class="card-label">UNTOUCHED OOS SHARPE</div>
+                    <div class="card-value highlight-purple" id="pf-oos-sharpe">2.84</div>
+                    <div class="card-subtext">Sortino: <span id="pf-oos-sortino">3.42</span> | MaxDD: <span id="pf-oos-dd">6.4%</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Multi-Dimensional Breakdown & Risk Telemetry -->
+        <div class="two-col-layout">
+            <section class="section-container">
+                <h2 class="section-title">📊 BREAKDOWN BY SYMBOL & SESSION</h2>
+                <div class="card table-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Trades</th>
+                                <th>Win Rate</th>
+                                <th>Profit Factor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-symbols">
+                            <tr><td>EURUSD</td><td>80</td><td>72.5%</td><td>3.10</td></tr>
+                            <tr><td>GOLD#</td><td>40</td><td>75.0%</td><td>3.50</td></tr>
+                            <tr><td>GBPUSD</td><td>50</td><td>68.0%</td><td>2.45</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="section-container">
+                <h2 class="section-title">🛡️ RISK & ML TELEMETRY</h2>
+                <div class="metrics-grid grid-2">
+                    <div class="card">
+                        <div class="card-label">PORTFOLIO DRAWDOWN STATE</div>
+                        <div class="card-value highlight-green" id="rk-state">NORMAL</div>
+                        <div class="card-subtext">Current DD: <span id="rk-dd">0.45%</span> / Limit: 3.0%</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">ML FEATURE DRIFT (PSI)</div>
+                        <div class="card-value highlight-cyan" id="ml-psi">0.04</div>
+                        <div class="card-subtext" id="ml-drift-status">STABLE (No Drift ✅)</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

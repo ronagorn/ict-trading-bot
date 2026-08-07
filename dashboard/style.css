@@ -1,0 +1,207 @@
+/* AURA v5 — Institutional Observability Dashboard Stylesheet */
+:root {
+    --bg-dark: #090c10;
+    --card-bg: rgba(18, 24, 36, 0.75);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --text-main: #f0f6fc;
+    --text-muted: #8b949e;
+    --accent-cyan: #00f2fe;
+    --accent-green: #00e676;
+    --accent-purple: #7c4dff;
+    --accent-gold: #ffd700;
+    --accent-red: #ff5252;
+    --font-heading: 'Outfit', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-dark);
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(0, 242, 254, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(124, 77, 255, 0.05) 0px, transparent 50%);
+    color: var(--text-main);
+    font-family: var(--font-heading);
+    min-height: 100vh;
+    padding: 24px;
+}
+
+.app-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Header */
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 28px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.logo-icon {
+    font-size: 32px;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.status-badge {
+    background: rgba(0, 230, 118, 0.12);
+    color: var(--accent-green);
+    border: 1px solid rgba(0, 230, 118, 0.3);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--accent-green);
+    border-radius: 50%;
+    animation: pulse 1.8s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.2); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.timestamp-display {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    text-align: right;
+    margin-top: 4px;
+}
+
+/* Section */
+.section-container {
+    margin-bottom: 28px;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+}
+
+/* Grids */
+.metrics-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+.two-col-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+/* Cards */
+.card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.card-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.card-value {
+    font-size: 26px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    margin-bottom: 6px;
+}
+
+.card-subtext {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* Status colors */
+.status-online { color: var(--accent-green); }
+.highlight-green { color: var(--accent-green); }
+.highlight-cyan { color: var(--accent-cyan); }
+.highlight-purple { color: var(--accent-purple); }
+
+/* Table */
+.table-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.data-table th {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-muted);
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    font-family: var(--font-mono);
+}
+
+@media (max-width: 1024px) {
+    .grid-4, .grid-3, .two-col-layout { grid-template-columns: 1fr; }
+}
