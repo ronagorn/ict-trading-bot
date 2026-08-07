@@ -1,0 +1,21 @@
+{
+  "model_version": "5.0.0",
+  "training_timestamp": "2026-08-07T16:04:39.970259+00:00",
+  "feature_schema_version": "v5.0_audited",
+  "dataset_hash": "001b54aca28b1b92",
+  "calibration_version": "Platt_Sigmoid_CV",
+  "samples_trained": 80,
+  "mean_cv_accuracy": 0.5167,
+  "threshold": 0.6,
+  "feature_columns": [
+    "fvg_size_pips",
+    "killzone_hour",
+    "trend_alignment",
+    "volume_spike_ratio",
+    "fvg_quality_score",
+    "ob_quality_score",
+    "liquidity_quality_score",
+    "atr_percentile",
+    "trend_score"
+  ]
+}

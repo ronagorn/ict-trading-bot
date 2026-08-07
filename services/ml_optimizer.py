@@ -122,9 +122,10 @@ class MLOptimizer:
         if len(np.unique(y)) < 2:
             raise ValueError("Need both WIN and LOSS samples for training")
 
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.25, random_state=42, stratify=y
-        )
+        # Temporal sequential split (75% train, 25% test) to prevent future data leakage
+        split_idx = int(len(X) * 0.75)
+        X_train, X_test = X[:split_idx], X[split_idx:]
+        y_train, y_test = y[:split_idx], y[split_idx:]
 
         models = {
             "RandomForest": RandomForestClassifier(

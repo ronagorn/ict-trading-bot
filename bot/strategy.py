@@ -16,6 +16,9 @@
 =====================================================================
 """
 
+import sys
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 import json
 import os
 from datetime import datetime, time as dt_time
@@ -213,7 +216,7 @@ class ICTStrategy:
 
     def _detect_session_liquidity_sweep(self, df, want_direction=1, lookback=80):
         """
-        ตรวจ Liquidity Sweep ของ Session High/Low ก่อน MSS
+        ตรวจ Liquidity Sweep ของ Session High/Low ก่อน MSS (Strict Temporal Integrity)
         Bull: ราคากวาดต่ำกว่า session low แล้วปิดกลับเหนือ
         Bear: ราคากวาดสูงกว่า session high แล้วปิดกลับต่ำกว่า
         """
@@ -221,20 +224,25 @@ class ICTStrategy:
             return None
 
         recent = df.tail(lookback).copy()
-        session_bars = pd.concat([
-            self._bars_in_ny_session(recent, "london"),
-            self._bars_in_ny_session(recent, "new_york"),
-        ]).drop_duplicates()
-
-        if session_bars.empty:
-            session_high = recent["high"].iloc[:-5].max()
-            session_low = recent["low"].iloc[:-5].min()
-        else:
-            session_high = session_bars["high"].max()
-            session_low = session_bars["low"].min()
-
         sweep_window = recent.tail(15)
+
         for idx in sweep_window.index:
+            history_before_idx = recent.loc[:idx].iloc[:-1]
+            if len(history_before_idx) < 10:
+                continue
+
+            session_bars = pd.concat([
+                self._bars_in_ny_session(history_before_idx, "london"),
+                self._bars_in_ny_session(history_before_idx, "new_york"),
+            ]).drop_duplicates()
+
+            if session_bars.empty:
+                session_high = history_before_idx["high"].max()
+                session_low = history_before_idx["low"].min()
+            else:
+                session_high = session_bars["high"].max()
+                session_low = session_bars["low"].min()
+
             bar = recent.loc[idx]
             if want_direction == 1:
                 if bar["low"] < session_low and bar["close"] > session_low:
