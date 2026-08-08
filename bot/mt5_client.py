@@ -52,18 +52,22 @@ class MT5Client:
             WS_EX_APPWINDOW = 0x00040000
             WS_EX_TOOLWINDOW = 0x00000080
             
-            EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_int, ctypes.c_int)
+            # ใช้ c_size_t (pointer-sized) แทน c_int เพื่อรองรับ HWND 64-bit บน Windows 64-bit
+            EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_size_t, ctypes.c_size_t)
+            user32.GetWindowThreadProcessId.argtypes = [ctypes.c_size_t, ctypes.POINTER(ctypes.c_ulong)]
+            user32.GetWindowLongW.argtypes = [ctypes.c_size_t, ctypes.c_int]
+            user32.GetWindowLongW.restype = ctypes.c_long
+            user32.SetWindowLongW.argtypes = [ctypes.c_size_t, ctypes.c_int, ctypes.c_long]
+            user32.ShowWindow.argtypes = [ctypes.c_size_t, ctypes.c_int]
             found_count = [0]
 
             def foreach_window(hwnd, lparam):
                 pid = ctypes.c_ulong()
                 user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
                 if pid.value in target_pids:
-                    # ปรับแต่ง Window Extended Style เพื่อลบไอคอนออกจาก Taskbar ด้านล่างโดยตรง
                     ex_style = user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
                     new_ex_style = (ex_style & ~WS_EX_APPWINDOW) | WS_EX_TOOLWINDOW
                     user32.SetWindowLongW(hwnd, GWL_EXSTYLE, new_ex_style)
-                    # ซ่อนหน้าต่าง
                     user32.ShowWindow(hwnd, 0)  # 0 = SW_HIDE
                     found_count[0] += 1
                 return True
@@ -110,7 +114,15 @@ class MT5Client:
             WS_EX_APPWINDOW = 0x00040000
             WS_EX_TOOLWINDOW = 0x00000080
             
-            EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_int, ctypes.c_int)
+            # ใช้ c_size_t (pointer-sized) แทน c_int เพื่อรองรับ HWND 64-bit บน Windows 64-bit
+            EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_size_t, ctypes.c_size_t)
+            user32.GetWindowThreadProcessId.argtypes = [ctypes.c_size_t, ctypes.POINTER(ctypes.c_ulong)]
+            user32.GetWindowLongW.argtypes = [ctypes.c_size_t, ctypes.c_int]
+            user32.GetWindowLongW.restype = ctypes.c_long
+            user32.SetWindowLongW.argtypes = [ctypes.c_size_t, ctypes.c_int, ctypes.c_long]
+            user32.ShowWindow.argtypes = [ctypes.c_size_t, ctypes.c_int]
+            user32.BringWindowToTop.argtypes = [ctypes.c_size_t]
+            user32.SetForegroundWindow.argtypes = [ctypes.c_size_t]
             found_hwnds = []
 
             def foreach_window(hwnd, lparam):
@@ -120,7 +132,7 @@ class MT5Client:
                     ex_style = user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
                     new_ex_style = (ex_style & ~WS_EX_TOOLWINDOW) | WS_EX_APPWINDOW
                     user32.SetWindowLongW(hwnd, GWL_EXSTYLE, new_ex_style)
-                    user32.ShowWindow(hwnd, 9)   # 9 = SW_RESTORE (restore จาก minimize)
+                    user32.ShowWindow(hwnd, 9)   # 9 = SW_RESTORE
                     user32.BringWindowToTop(hwnd)
                     user32.SetForegroundWindow(hwnd)
                     found_hwnds.append(hwnd)

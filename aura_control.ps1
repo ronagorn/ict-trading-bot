@@ -8,6 +8,67 @@ if (-not $ScriptDir) {
     $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 }
 
+# ======================================================
+# Load MT5 Window Helper (C# WinAPI) — Define Once
+# ======================================================
+if (-not ([System.Management.Automation.PSTypeName]'MT5WinHelper').Type) {
+    Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+using System.Collections.Generic;
+public static class MT5WinHelper {
+    [DllImport("user32.dll")] private static extern bool EnumWindows(EnumWindowsDelegate lpEnumFunc, IntPtr lParam);
+    private delegate bool EnumWindowsDelegate(IntPtr hWnd, IntPtr lParam);
+    [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+    [DllImport("user32.dll")] private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);
+    [DllImport("user32.dll")] private static extern bool BringWindowToTop(IntPtr hWnd);
+    [DllImport("user32.dll")] private static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
+    [DllImport("user32.dll")] private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+    public static int ShowWindows(int[] pids) {
+        var pidSet = new HashSet<uint>();
+        foreach (var p in pids) pidSet.Add((uint)p);
+        int found = 0;
+        EnumWindows((hwnd, lp) => {
+            uint pid;
+            GetWindowThreadProcessId(hwnd, out pid);
+            if (pidSet.Contains(pid)) {
+                IntPtr exStyle = GetWindowLongPtr(hwnd, -20);
+                long newStyle = (exStyle.ToInt64() & ~0x80L) | 0x40000L;
+                SetWindowLongPtr(hwnd, -20, new IntPtr(newStyle));
+                ShowWindow(hwnd, 9);
+                BringWindowToTop(hwnd);
+                SetForegroundWindow(hwnd);
+                found++;
+            }
+            return true;
+        }, IntPtr.Zero);
+        return found;
+    }
+
+    public static int HideWindows(int[] pids) {
+        var pidSet = new HashSet<uint>();
+        foreach (var p in pids) pidSet.Add((uint)p);
+        int found = 0;
+        EnumWindows((hwnd, lp) => {
+            uint pid;
+            GetWindowThreadProcessId(hwnd, out pid);
+            if (pidSet.Contains(pid)) {
+                IntPtr exStyle = GetWindowLongPtr(hwnd, -20);
+                long newStyle = (exStyle.ToInt64() & ~0x40000L) | 0x80L;
+                SetWindowLongPtr(hwnd, -20, new IntPtr(newStyle));
+                ShowWindow(hwnd, 0);
+                found++;
+            }
+            return true;
+        }, IntPtr.Zero);
+        return found;
+    }
+}
+"@
+}
+
 function Show-Menu {
     Clear-Host
     Write-Host "============================================================" -ForegroundColor Cyan
@@ -81,15 +142,33 @@ do {
             Start-Sleep -Seconds 2
         }
         "7" {
-            Write-Host "👁️ Restoring XM MT5 Window..." -ForegroundColor Cyan
-            python -c "from bot.mt5_client import MT5Client; client = MT5Client(); client.show_window()"
-            Write-Host "✅ [OK] MT5 Window unhidden and restored to Taskbar." -ForegroundColor Green
+            Write-Host "👁️ Restoring XM MT5 Window to Foreground..." -ForegroundColor Cyan
+            $mt5Pids = (Get-CimInstance Win32_Process | Where-Object { $_.Name -eq 'terminal64.exe' }).ProcessId
+            if ($mt5Pids) {
+                $restored = [MT5WinHelper]::ShowWindows([int[]]@($mt5Pids))
+                if ($restored -gt 0) {
+                    Write-Host "✅ [OK] XM MT5 Window restored and brought to front ($restored window(s))." -ForegroundColor Green
+                } else {
+                    Write-Host "⚠️ terminal64.exe พบ แต่ไม่มีหน้าต่างที่ restore ได้ (อาจซ่อนด้วย SW_HIDE)" -ForegroundColor Yellow
+                }
+            } else {
+                Write-Host "⚠️ XM MT5 (terminal64.exe) ไม่ได้เปิดอยู่ในระบบ" -ForegroundColor Red
+            }
             Start-Sleep -Seconds 2
         }
         "8" {
             Write-Host "🙈 Hiding XM MT5 Window..." -ForegroundColor DarkGray
-            python -c "from bot.mt5_client import MT5Client; client = MT5Client(); client.hide_window()"
-            Write-Host "✅ [OK] MT5 Window hidden from Taskbar." -ForegroundColor Green
+            $mt5Pids = (Get-CimInstance Win32_Process | Where-Object { $_.Name -eq 'terminal64.exe' }).ProcessId
+            if ($mt5Pids) {
+                $hidden = [MT5WinHelper]::HideWindows([int[]]@($mt5Pids))
+                if ($hidden -gt 0) {
+                    Write-Host "✅ [OK] XM MT5 Window hidden from Taskbar ($hidden window(s))." -ForegroundColor Green
+                } else {
+                    Write-Host "⚠️ terminal64.exe พบ แต่ไม่มีหน้าต่างที่ซ่อนได้" -ForegroundColor Yellow
+                }
+            } else {
+                Write-Host "⚠️ XM MT5 (terminal64.exe) ไม่ได้เปิดอยู่ในระบบ" -ForegroundColor Red
+            }
             Start-Sleep -Seconds 2
         }
         "0" {
