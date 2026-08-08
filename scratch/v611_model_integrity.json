@@ -1,0 +1,19 @@
+{
+  "model_path": "data/ml_models/production_xgboost_calibrated.pkl",
+  "model_sha256": "900bd557402af59fd7a7e4bb6be5938a2d908213d874d0140d86847d31a6af05",
+  "expected_sha256": "900bd557402af59fd7a7e4bb6be5938a2d908213d874d0140d86847d31a6af05",
+  "feature_count": 9,
+  "audited_features": [
+    "fvg_size_pips",
+    "killzone_hour",
+    "trend_alignment",
+    "volume_spike_ratio",
+    "fvg_quality_score",
+    "ob_quality_score",
+    "liquidity_quality_score",
+    "atr_percentile",
+    "trend_score"
+  ],
+  "verification_result": "MODEL_INTEGRITY_VERIFIED \u2705",
+  "action_on_mismatch": "STOP_SIGNAL_GENERATION"
+}

@@ -1,0 +1,11 @@
+{
+  "chronological_ordering": "STRICTLY_CHRONOLOGICAL \u2705",
+  "future_data_leakage": "NONE_DETECTED \u2705",
+  "lookahead_bias": "NONE_DETECTED \u2705",
+  "market_data_limits": {
+    "max_allowed_spread_pts": 500,
+    "max_allowed_latency_ms": 3000,
+    "stale_data_halt_seconds": 60
+  },
+  "verification_status": "DATA_SAFETY_VERIFIED \u2705"
+}

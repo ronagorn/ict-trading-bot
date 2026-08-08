@@ -1,0 +1,21 @@
+{
+  "manifest_version": "v6.11",
+  "baseline_commit": "7ab805d220e62156efdbe54b07c0fb87a7e55a26",
+  "model_version": "v6.0_real_data",
+  "model_hash": "900bd557402af59fd7a7e4bb6be5938a2d908213d874d0140d86847d31a6af05",
+  "feature_schema_hash": "c7f17935a4ba84b043820fb5aaaa4c916a40f4849bf8e1e9081ca17aa6d53ef3",
+  "threshold": 0.6,
+  "asset_whitelist": [
+    "XAUUSD",
+    "BTCUSD",
+    "GBPUSD",
+    "EURUSD"
+  ],
+  "rr": "1:2",
+  "sl_definition": "Entry - (0.5 * ATR)",
+  "tp_definition": "Entry + (2 * Risk)",
+  "label_definition": "WIN = +2R, LOSS = -1R",
+  "theoretical_breakeven_win_rate": "33.33%",
+  "account_mode_enforced": "DEMO",
+  "manifest_timestamp": "2026-08-08T12:21:08.184324+00:00"
+}

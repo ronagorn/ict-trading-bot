@@ -1,0 +1,9 @@
+{
+  "audit_version": "v6.11",
+  "ledger_file": "scratch/v611_forward_ledger.csv",
+  "total_trades": 11,
+  "genesis_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "final_cumulative_hash": "135208c306f2c5c447494c12798e2bcf5831006384786d49089cc05adc0def77",
+  "verification_result": "LEDGER_INTEGRITY_VERIFIED \u2705",
+  "tamper_detection": "ZERO MODIFICATIONS DETECTED"
+}

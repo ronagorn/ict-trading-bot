@@ -1,0 +1,16 @@
+{
+  "checkpoint_N17": {
+    "requested_N": 17,
+    "actual_N": 11,
+    "wins": 4,
+    "losses": 7,
+    "win_rate": 36.36,
+    "net_R": 1.0,
+    "expectancy": 0.0909,
+    "profit_factor": 1.1429,
+    "realized_net_R": -4.97,
+    "realized_expectancy": -0.4519,
+    "max_dd": 5.47,
+    "gate_status": "Gate A In-Progress \u23f3"
+  }
+}

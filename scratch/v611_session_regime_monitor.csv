@@ -1,0 +1,5 @@
+n,wins,losses,win_rate,gross_profit,gross_loss,net_r,expectancy,profit_factor,realized_net_r,realized_expectancy,max_dd,symbol
+4,1,3,25.0,2.0,3.0,-1.0,-0.25,0.6667,-1.0,-0.25,1.0,BTCUSD
+2,1,1,50.0,2.0,1.0,1.0,0.5,2.0,1.0,0.5,1.0,EURUSD
+2,2,0,100.0,4.0,0.0,4.0,2.0,inf,4.0,2.0,0.0,GBPUSD
+3,0,3,0.0,0.0,3.0,-3.0,-1.0,0.0,-3.0,-1.0,2.0,XAUUSD

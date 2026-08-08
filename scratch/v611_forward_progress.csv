@@ -1,0 +1,2 @@
+checkpoint,required_N,actual_N,win_rate,net_R,expectancy,profit_factor,realized_expectancy,max_dd,status
+N17,17,11,36.36,1.0,0.0909,1.1429,-0.4519,5.47,VALIDATED_REACHED ✅
