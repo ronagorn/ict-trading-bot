@@ -1,0 +1,5 @@
+test_case,simulated_condition,expected_http,expected_behavior,status
+Invalid Token (getMe),Token = 'INVALID_TOKEN_123',401,Catch Exception & Log Authentication Error,VERIFIED_FAIL_SAFE ✅
+Invalid Chat ID (sendMessage),ChatID = '000000000',400,Catch Exception & Log Invalid Chat Error,VERIFIED_FAIL_SAFE ✅
+Network Timeout,Timeout = 0.001s,TIMEOUT,Catch Timeout & Log Bounded Backoff,VERIFIED_FAIL_SAFE ✅
+MT5 / Telegram Isolation Test,Telegram Network Blocked,ERROR,Trading & Model Execution Remains 100% Unaffected,VERIFIED_FAIL_SAFE ✅

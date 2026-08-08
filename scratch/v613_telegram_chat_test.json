@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-08-08T14:34:40.593356+00:00",
+  "endpoint": "sendMessage",
+  "destination_chat_id": "[REDACTED_CHAT_ID]",
+  "http_status": null,
+  "delivery_ok": false,
+  "message_id": null,
+  "latency_ms": 0.0,
+  "chat_status_class": "UNKNOWN"
+}

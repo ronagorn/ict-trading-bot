@@ -4,13 +4,19 @@ import threading
 import requests
 from bot.logger import logger
 
+from dotenv import load_dotenv
+
 class TelegramNotifier:
     def __init__(self):
+        load_dotenv()
         self.token = os.getenv("TELEGRAM_BOT_TOKEN")
         self.chat_id = str(os.getenv("TELEGRAM_CHAT_ID", "")).strip()
         self.dashboard_url = os.getenv("DASHBOARD_URL", "")
-        self.api_url = f"https://api.telegram.org/bot{self.token}/"
+        self.api_url = f"https://api.telegram.org/bot{self.token}/" if self.token else ""
         self.enabled = bool(self.token and self.chat_id)
+
+        if not self.enabled:
+            logger.warning("TelegramNotifier: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is missing or empty in environment. Telegram notifications disabled.")
 
         self._is_paused = False
         self._running = False

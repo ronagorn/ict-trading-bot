@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-08-08T14:34:40.592512+00:00",
+  "endpoint": "getMe",
+  "http_status": null,
+  "api_ok": false,
+  "bot_username": "[REDACTED]",
+  "response_time_ms": 0.0,
+  "connectivity_class": "UNKNOWN"
+}
