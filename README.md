@@ -141,41 +141,43 @@ Profit Factor = Gross Profit / Gross Loss
 
 ---
 
-## 4. v6.8 Adversarial Validation Results
+## 4. v6.8 Adversarial Validation Results & Data Lineage Audit
 
-**These are real forward-OOS observations collected after the hypothesis was locked at v6.7.**
+> **Forensic Lineage Note**: Earlier document summaries reported $N=17$ due to a manual reporting typo in the v6.8 summary text. Comprehensive forensic audit of all primary artifacts (`scratch/v68_forward_oos.csv`, `scratch/v611_forward_ledger.csv`, and `canonical_trade_level_dataset.csv`) confirms that the **single immutable source of truth contains exactly $N=11$ trades** passing the $P \ge 0.60$ threshold for Class A assets in the holdout dataset. No trades were lost or deleted.
+
+**Verified Forward Out-of-Sample metrics ($N=11$):**
 
 ```
-Forward sample:       17 trades (as of v6.8 adversarial audit)
-Wins:                 7
-Losses:               10
-Win rate:             41.18%
-95% Wilson CI:        [21.64% – 63.99%]
+Forward Holdout sample: 11 trades
+Wins (Y=1):             4
+Losses (Y=0):           7
+Win rate:               36.36%
+95% Wilson CI:          [15.17% – 64.62%]
 
-Gross profit:         +14R
-Gross loss:           −10R
-Net R:                +4R
-Expectancy:           +0.2353 R/trade
-Profit Factor:        1.40
+Gross profit:           +8.00R  (4 wins × +2R)
+Gross loss:             −7.00R  (7 losses × -1R)
+Net R (gross):          +1.00R
+Expectancy (gross):     +0.0909 R/trade
+Profit Factor:          1.1429
 
 After MT5 execution costs:
-Net R (cost-adj):     +3.15R
-Expectancy (cost-adj): +0.1853 R/trade
+Realized Net R:         −4.97R
+Realized Expectancy:    −0.4519 R/trade
 
-Maximum Drawdown:     3R
+Maximum Drawdown:       5.47R
 ```
 
 **Statistical inference:**
 
 ```
-One-sided t-test:
-t  = 0.9578
-p  = 0.1764   ← NOT statistically significant
+One-sided t-test (H0: Expectancy <= 0 vs H1: Expectancy > 0):
+t  = 0.1992
+p  = 0.4230   ← FAIL TO REJECT H0 (NOT statistically significant)
 ```
 
-> A p-value of 0.1764 means this result does NOT establish statistical significance.  
-> The 95% Wilson confidence interval spans from below break-even (21.64%) to well above (63.99%).  
-> This is consistent with random variation given N=17.
+> The $p$-value of 0.4230 confirms that current evidence does NOT establish statistical significance.  
+> The 95% Wilson confidence interval spans from 15.17% to 64.62%.  
+> This confirms that production deployment remains strictly blocked while forward demo collection continues.
 
 **Current conclusion:** `PROMISING — CONTINUE FORWARD COLLECTION`
 
