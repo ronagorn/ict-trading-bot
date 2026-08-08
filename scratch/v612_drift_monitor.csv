@@ -1,0 +1,10 @@
+feature,psi,ks_statistic,p_value,drift_level,alert
+fvg_size_pips,0.4009,0.2275,0.0,SEVERE_DRIFT,WARNING
+killzone_hour,0.2553,0.1302,0.0062,SEVERE_DRIFT,WARNING
+trend_alignment,0.0,0.0,1.0,NO_DRIFT,OK
+volume_spike_ratio,0.0999,0.0857,0.1613,NO_DRIFT,OK
+fvg_quality_score,0.0545,0.056,0.6464,NO_DRIFT,OK
+ob_quality_score,0.0,0.0,1.0,NO_DRIFT,OK
+liquidity_quality_score,0.0,0.0,1.0,NO_DRIFT,OK
+atr_percentile,0.0,0.0,1.0,NO_DRIFT,OK
+trend_score,0.0,0.0,1.0,NO_DRIFT,OK

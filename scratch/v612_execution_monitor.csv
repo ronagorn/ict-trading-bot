@@ -1,0 +1,5 @@
+metric,value,baseline,status
+Average Spread (pts),150.0,150.0,NORMAL ✅
+Average Slippage (pts),0.0,0.0,NORMAL ✅
+Average Delay (ms),120.0,150.0,NORMAL ✅
+Execution Cost / Expected R,0.05 R / 0.2353 R,< 0.20 R,ACCEPTABLE ✅

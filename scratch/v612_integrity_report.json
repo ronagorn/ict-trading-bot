@@ -1,0 +1,12 @@
+{
+  "audit_version": "v6.12",
+  "timestamp": "2026-08-08T14:22:54.896583+00:00",
+  "git_head": "6c0145d81460ccacd363a12082399aaac276f7b4",
+  "model_hash": "900bd557402af59fd7a7e4bb6be5938a2d908213d874d0140d86847d31a6af05",
+  "schema_hash": "c7f17935a4ba84b043820fb5aaaa4c916a40f4849bf8e1e9081ca17aa6d53ef3",
+  "ledger_hash": "f0a05e669d5fe181bcaf2e837258da164a14a46931694ff46f2a3bd3e219645d",
+  "baseline_n": 11,
+  "ledger_integrity": "IMMUTABLE_HASH_VERIFIED \u2705",
+  "tamper_status": "ZERO MODIFICATIONS DETECTED",
+  "research_integrity": "NO_FORWARD_DATA_CONTAMINATION \u2705"
+}

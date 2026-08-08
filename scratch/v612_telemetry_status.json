@@ -1,0 +1,12 @@
+{
+  "status_version": "v6.12",
+  "current_alert_level": "GREEN",
+  "operational_verdict": "CONTINUE MONITORING",
+  "production_status": "STRICTLY BLOCKED \ud83d\udd34",
+  "current_N": 11,
+  "current_net_R": 1.0,
+  "current_expectancy": 0.0909,
+  "current_profit_factor": 1.1429,
+  "cost_adjusted_expectancy": -0.4519,
+  "max_drawdown": 5.47
+}
