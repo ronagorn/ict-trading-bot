@@ -1,0 +1,5 @@
+exp_id,hypothesis,data_split,result,timestamp
+EXP_01,Lineage Audit,Canonical,PASSED ✅,2026-08-08T12:16:49.959368+00:00
+EXP_02,Forward OOS Evaluation,Holdout,"Net R = 1.0 R, Exp = 0.0909 R",2026-08-08T12:16:49.959394+00:00
+EXP_03,Walk-Forward Validation,Train/Val,Positive Expectancy across Windows,2026-08-08T12:16:49.959397+00:00
+EXP_04,Execution Stress Test 1.5x,Holdout,Survives cost multiplier 1.5x,2026-08-08T12:16:49.959400+00:00

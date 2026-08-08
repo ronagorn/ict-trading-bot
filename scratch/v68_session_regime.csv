@@ -1,0 +1,7 @@
+n,wins,losses,win_rate,gross_profit,gross_loss,net_r,expectancy,profit_factor,realized_net_r,realized_expectancy,max_dd,sharpe,sortino,category,regime_name
+1,0,1,0.0,0.0,1.0,-1.0,-1.0,0.0,-1.01,-1.0125,0.0,0.0,0.0,Session,Asian
+7,2,5,28.57,4.0,5.0,-1.0,-0.1429,0.8,-4.82,-0.689,6.34,-7.0,-12.7,Session,London
+3,2,1,66.67,4.0,1.0,3.0,1.0,4.0,0.86,0.2881,1.06,4.8,0.0,Session,London/NY Overlap
+0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Session,New York
+6,1,5,16.67,2.0,5.0,-3.0,-0.5,0.4,-3.6,-0.6005,3.12,-8.35,-63.39,Volatility Regime,High Volatility
+5,3,2,60.0,6.0,2.0,4.0,0.8,3.0,-1.37,-0.2736,4.28,-2.59,-3.92,Volatility Regime,Low Volatility

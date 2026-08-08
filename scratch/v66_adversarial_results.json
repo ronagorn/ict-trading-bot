@@ -1,0 +1,5 @@
+{
+  "feature_perturbation_degradation": "Gradual degradation observed (Robust)",
+  "parameter_jitter_stability": "n_estimators +- 20 maintains ranking score (Stable)",
+  "threshold_jitter_stability": "Threshold 0.58-0.62 shows smooth monotonic response"
+}

@@ -1,0 +1,18 @@
+{
+  "evaluation_timestamp": "2026-08-08T12:05:31.169976+00:00",
+  "git_commit": "7ab805d220e62156efdbe54b07c0fb87a7e55a26",
+  "model_sha256": "900bd557402af59fd7a7e4bb6be5938a2d908213d874d0140d86847d31a6af05",
+  "threshold": 0.6,
+  "holdout_total_setups": 191,
+  "holdout_approved_trades": 37,
+  "wins": 9,
+  "losses": 28,
+  "win_rate": 24.32,
+  "gross_profit_R": 27.0,
+  "gross_loss_R": 28.0,
+  "theoretical_net_R": -1.0,
+  "expectancy_R_per_trade": -0.027,
+  "profit_factor": 0.9643,
+  "realized_net_R": -131.92,
+  "realized_expectancy": -3.5653
+}

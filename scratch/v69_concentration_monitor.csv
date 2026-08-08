@@ -1,0 +1,4 @@
+metric,n,net_r,expectancy,pf
+Full Strategy,11,1.0,0.0909,1.1429
+Remove Best 1 Trade,10,-1.0,-0.1,0.8571
+Remove Best 3 Trades,8,-5.0,-0.625,0.2857

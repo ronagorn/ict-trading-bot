@@ -1,0 +1,10 @@
+{
+  "resamples": 10000,
+  "sample_size": 87,
+  "expectancy_p05": -0.8621,
+  "expectancy_p50": -0.6782,
+  "expectancy_p95": -0.4943,
+  "net_r_p05": -75.0,
+  "net_r_p50": -59.0,
+  "net_r_p95": -43.0
+}

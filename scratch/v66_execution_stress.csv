@@ -1,0 +1,5 @@
+cost_multiplier,trades_n,theoretical_net_r,realized_net_r,realized_expectancy,tolerable_status
+1.00x,87,-59.0,-341.91,-3.93,FAIL ❌
+1.25x,87,-59.0,-412.64,-4.743,FAIL ❌
+1.50x,87,-59.0,-483.37,-5.556,FAIL ❌
+2.00x,87,-59.0,-624.82,-7.1819,FAIL ❌

@@ -1,0 +1,29 @@
+{
+  "git_commit": "7ab805d220e62156efdbe54b07c0fb87a7e55a26",
+  "python_version": "3.13.14",
+  "canonical_dataset_sha256": "78b2da608985ba2aa32b8d7b128e322fc7e5a763b943ae1af80547d2463125fe",
+  "model_binary_sha256": "900bd557402af59fd7a7e4bb6be5938a2d908213d874d0140d86847d31a6af05",
+  "model": "Base XGBoost",
+  "threshold": 0.6,
+  "class_a_whitelist": [
+    "XAUUSD",
+    "BTCUSD",
+    "GBPUSD",
+    "EURUSD"
+  ],
+  "rr_target": "1:2",
+  "feature_schema": [
+    "fvg_size_pips",
+    "killzone_hour",
+    "trend_alignment",
+    "volume_spike_ratio",
+    "fvg_quality_score",
+    "ob_quality_score",
+    "liquidity_quality_score",
+    "atr_percentile",
+    "trend_score"
+  ],
+  "chronological_ordering_verified": true,
+  "future_data_leakage_audit": "PASSED \u2705 (Zero future rows in training/feature pipeline)",
+  "audit_timestamp": "2026-08-08T12:16:46.453628+00:00"
+}

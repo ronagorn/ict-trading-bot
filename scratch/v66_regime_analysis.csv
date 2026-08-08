@@ -1,0 +1,3 @@
+n,wins,losses,win_rate,gross_profit,gross_loss,net_r,expectancy,profit_factor,realized_net_r,realized_expectancy,max_dd,regime,total_setups
+154,38,116,24.68,114.0,116.0,-2.0,-0.013,0.9828,-313.55,-2.036,308.72,High Volatility,955
+226,55,171,24.34,165.0,171.0,-6.0,-0.0265,0.9649,-739.75,-3.2732,734.48,Low Volatility,951

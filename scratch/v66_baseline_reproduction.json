@@ -1,0 +1,47 @@
+{
+  "reproduction_timestamp": "2026-08-08T12:05:23.152976+00:00",
+  "canonical_rows": 1906,
+  "train": {
+    "n": 256,
+    "wins": 77,
+    "losses": 179,
+    "win_rate": 30.08,
+    "gross_profit": 231.0,
+    "gross_loss": 179.0,
+    "net_r": 52.0,
+    "expectancy": 0.2031,
+    "profit_factor": 1.2905,
+    "realized_net_r": -579.47,
+    "realized_expectancy": -2.2636,
+    "max_dd": 574.64
+  },
+  "validation": {
+    "n": 87,
+    "wins": 7,
+    "losses": 80,
+    "win_rate": 8.05,
+    "gross_profit": 21.0,
+    "gross_loss": 80.0,
+    "net_r": -59.0,
+    "expectancy": -0.6782,
+    "profit_factor": 0.2625,
+    "realized_net_r": -341.91,
+    "realized_expectancy": -3.93,
+    "max_dd": 340.89
+  },
+  "holdout": {
+    "n": 37,
+    "wins": 9,
+    "losses": 28,
+    "win_rate": 24.32,
+    "gross_profit": 27.0,
+    "gross_loss": 28.0,
+    "net_r": -1.0,
+    "expectancy": -0.027,
+    "profit_factor": 0.9643,
+    "realized_net_r": -131.92,
+    "realized_expectancy": -3.5653,
+    "max_dd": 130.9
+  },
+  "v65_exact_match": true
+}

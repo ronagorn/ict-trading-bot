@@ -1,0 +1,2 @@
+n,wins,losses,win_rate,gross_profit,gross_loss,net_r,expectancy,profit_factor,realized_net_r,realized_expectancy,max_dd,sharpe,sortino,wilson_ci_95,target_rr,data_split,t_statistic,p_value_one_sided,hypothesis_test_result
+11,4,7,36.36,8.0,7.0,1.0,0.0909,1.1429,-4.97,-0.4519,5.47,-5.05,-9.39,"[15.17%, 64.62%]",1:2,HOLDOUT (Class A Whitelist),0.1992,0.423,FAIL TO REJECT H0 🔴

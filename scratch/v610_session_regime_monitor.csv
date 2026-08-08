@@ -1,0 +1,4 @@
+n,wins,losses,win_rate,gross_profit,gross_loss,net_r,expectancy,profit_factor,realized_net_r,realized_expectancy,max_dd,session
+1,0,1,0.0,0.0,1.0,-1.0,-1.0,0.0,-1.01,-1.0125,0.0,Asian
+7,2,5,28.57,4.0,5.0,-1.0,-0.1429,0.8,-4.82,-0.689,6.34,London
+3,2,1,66.67,4.0,1.0,3.0,1.0,4.0,0.86,0.288,1.06,London/NY Overlap

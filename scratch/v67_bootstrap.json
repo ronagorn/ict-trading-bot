@@ -1,0 +1,12 @@
+{
+  "resamples": 10000,
+  "sample_size": 28,
+  "rr_target": "1:2",
+  "expectancy_p05": -0.8929,
+  "expectancy_p50": -0.6786,
+  "expectancy_p95": -0.3571,
+  "net_r_p05": -25.0,
+  "net_r_p50": -19.0,
+  "net_r_p95": -10.0,
+  "entirely_above_zero": false
+}

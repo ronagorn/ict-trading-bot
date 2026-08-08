@@ -1,0 +1,8 @@
+{
+  "audit_version": "v6.9",
+  "ledger_file": "scratch/v69_forward_ledger.csv",
+  "total_trades": 11,
+  "final_cumulative_hash": "393902d1af1923ee5d098b03f4e1217996a5397daf5f579b99fff0c067adcc9e",
+  "integrity_status": "VERIFIED_IMMUTABLE \u2705",
+  "tamper_check": "ZERO MODIFICATIONS DETECTED"
+}

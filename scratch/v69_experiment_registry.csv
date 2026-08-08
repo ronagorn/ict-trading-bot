@@ -1,0 +1,2 @@
+experiment_id,timestamp,hypothesis,dataset,model_version,parameters,result,influenced_model_selection,influenced_threshold,influenced_asset_selection,influenced_RR,notes
+EXP_V69_01,2026-08-08T12:17:05.729488+00:00,v6.9 Immutable Append-Only Ledger Telemetry,scratch/canonical_trade_level_dataset.csv,v6.0_real_data,"Threshold=0.60, Class A Whitelist, 1:2 RR","N=11, Net R=1.0 R, Realized Net R=-4.97 R",False,False,False,False,Strict immutable observation without peek-optimization

@@ -1,0 +1,6 @@
+{
+  "observed_roc_auc": 0.5219,
+  "permutations": 1000,
+  "p_value": 0.352,
+  "statistically_distinguishable": false
+}

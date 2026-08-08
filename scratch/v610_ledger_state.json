@@ -1,0 +1,11 @@
+{
+  "audit_version": "v6.10",
+  "timestamp": "2026-08-08T12:17:24.348282+00:00",
+  "total_records": 11,
+  "last_trade_id": "V69_TR_0011",
+  "last_timestamp": "2026-08-01 10:45:00+00:00",
+  "genesis_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "last_cumulative_hash": "3aebae50d0b551d74db3caa3f9d9d2e9fdeef715f3b6f5d5b4a0dc65120a689e",
+  "verification_status": "DETERMINISTIC_IMMUTABLE_VALID \u2705",
+  "tamper_detection": "ZERO MODIFICATIONS DETECTED"
+}

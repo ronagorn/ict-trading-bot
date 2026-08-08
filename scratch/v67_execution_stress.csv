@@ -1,0 +1,6 @@
+cost_multiplier,approved_n,theoretical_net_r,realized_net_r,realized_expectancy,status
+1.00x,28,-19.0,-51.58,-1.842,FAIL ❌
+1.25x,28,-19.0,-59.72,-2.1329,FAIL ❌
+1.50x,28,-19.0,-67.87,-2.4238,FAIL ❌
+1.75x,28,-19.0,-76.01,-2.7146,FAIL ❌
+2.00x,28,-19.0,-84.15,-3.0055,FAIL ❌

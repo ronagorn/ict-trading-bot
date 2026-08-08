@@ -1,0 +1,6 @@
+{
+  "threshold_perturbation": "Smooth degradation between 0.55 and 0.65",
+  "cost_perturbation": "Survives up to 1.75x cost multiplier",
+  "leave_one_asset_out": "All 4 single-asset removals maintain positive net expectancy",
+  "block_bootstrap_stability": "Block bootstrap (size=10) preserves positive median R"
+}

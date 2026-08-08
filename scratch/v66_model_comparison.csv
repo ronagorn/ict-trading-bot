@@ -1,0 +1,4 @@
+model,roc_auc,pr_auc,approved_n,expectancy,net_r
+Logistic Regression,0.5054,0.0705,37,-0.7838,-29.0
+Random Forest,0.5633,0.0815,83,-0.7108,-59.0
+Base XGBoost,0.5219,0.0765,87,-0.6782,-59.0

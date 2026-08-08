@@ -1,0 +1,16 @@
+{
+  "freeze_timestamp": "2026-08-08T12:07:53.645410+00:00",
+  "git_commit": "7ab805d220e62156efdbe54b07c0fb87a7e55a26",
+  "canonical_dataset_sha256": "78b2da608985ba2aa32b8d7b128e322fc7e5a763b943ae1af80547d2463125fe",
+  "model_binary_sha256": "900bd557402af59fd7a7e4bb6be5938a2d908213d874d0140d86847d31a6af05",
+  "model": "Base XGBoost",
+  "class_a_assets": [
+    "XAUUSD",
+    "BTCUSD",
+    "GBPUSD",
+    "EURUSD"
+  ],
+  "rr_target": "1:2",
+  "locked_threshold": 0.6,
+  "status": "RESEARCH FROZEN FOR OOS EVALUATION"
+}

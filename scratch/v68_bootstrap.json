@@ -1,0 +1,11 @@
+{
+  "resamples": 10000,
+  "sample_size": 11,
+  "expectancy_p05": -0.4545,
+  "expectancy_p50": 0.0909,
+  "expectancy_p95": 0.9091,
+  "prob_expectancy_gt_0": 61.46,
+  "prob_net_r_gt_0": 61.46,
+  "prob_max_dd_gt_10r": 0.0,
+  "prob_max_dd_gt_20r": 0.0
+}

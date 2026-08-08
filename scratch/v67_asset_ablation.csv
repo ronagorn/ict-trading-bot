@@ -1,0 +1,11 @@
+n,wins,losses,win_rate,gross_profit,gross_loss,net_r,expectancy,profit_factor,realized_net_r,realized_expectancy,max_dd,universe,rr
+87,7,80,8.05,14.0,80.0,-66.0,-0.7586,0.175,-348.91,-4.0105,347.89,Universe A (All 13 Assets),1:2
+28,3,25,10.71,6.0,25.0,-19.0,-0.6786,0.24,-51.58,-1.842,46.62,Universe B (Class A Whitelist),1:2
+4,0,4,0.0,0.0,4.0,-4.0,-1.0,0.0,-4.09,-1.0214,3.06,Single Asset (XAUUSD),1:2
+8,3,5,37.5,6.0,5.0,1.0,0.125,1.2,0.08,0.0102,4.33,Single Asset (BTCUSD),1:2
+8,0,8,0.0,0.0,8.0,-8.0,-1.0,0.0,-21.44,-2.6795,16.48,Single Asset (GBPUSD),1:2
+8,0,8,0.0,0.0,8.0,-8.0,-1.0,0.0,-26.14,-3.267,21.98,Single Asset (EURUSD),1:2
+24,3,21,12.5,6.0,21.0,-15.0,-0.625,0.2857,-47.49,-1.9788,42.53,Leave-One-Out (Excluding XAUUSD),1:2
+20,0,20,0.0,0.0,20.0,-20.0,-1.0,0.0,-51.66,-2.5829,46.7,Leave-One-Out (Excluding BTCUSD),1:2
+20,3,17,15.0,6.0,17.0,-11.0,-0.55,0.3529,-30.14,-1.507,28.17,Leave-One-Out (Excluding GBPUSD),1:2
+20,3,17,15.0,6.0,17.0,-11.0,-0.55,0.3529,-25.44,-1.272,22.9,Leave-One-Out (Excluding EURUSD),1:2

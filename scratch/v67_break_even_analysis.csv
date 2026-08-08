@@ -1,0 +1,5 @@
+cost_scenario,breakeven_win_rate,required_win_rate_val
+Zero Cost (Theoretical),33.33%,33.33
+1.0x Cost (Real MT5 Spread),35.20%,35.2
+1.5x Cost (Slippage Drag),37.50%,37.5
+2.0x Cost (Extreme Latency),41.10%,41.1

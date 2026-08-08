@@ -1,0 +1,6 @@
+{
+  "spread_slippage_degradation": "Survives up to 1.75x spread multiplier before net R becomes negative",
+  "best_1_trade_removal_expectancy": -0.1,
+  "best_3_trades_removal_expectancy": -0.625,
+  "feature_noise_perturbation": "Smooth degradation under 5% Gaussian noise injection"
+}

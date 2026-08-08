@@ -1,0 +1,5 @@
+symbol,approved_n,wins,losses,win_rate,net_r,expectancy,profit_factor,net_r_contribution_pct,concentration_risk_flag
+XAUUSD,4,0,4,0.0,-4.0,-1.0,0.0,21.05,NORMAL ✅
+BTCUSD,8,3,5,37.5,1.0,0.125,1.2,-5.26,NORMAL ✅
+GBPUSD,8,0,8,0.0,-8.0,-1.0,0.0,42.11,NORMAL ✅
+EURUSD,8,0,8,0.0,-8.0,-1.0,0.0,42.11,NORMAL ✅
