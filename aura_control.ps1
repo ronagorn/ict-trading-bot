@@ -1,4 +1,4 @@
-﻿# Set Console output encoding to UTF-8
+# Set Console output encoding to UTF-8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $host.UI.RawUI.WindowTitle = "AURA Super Trader - Control Center"
@@ -53,8 +53,23 @@ do {
             Start-Sleep -Seconds 2
         }
         "5" {
-            Write-Host "🌐 Launching Web Dashboard..." -ForegroundColor Green
-            Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$ScriptDir\run_dashboard.bat`""
+            Write-Host "🌐 Opening Web Dashboard..." -ForegroundColor Green
+            # โหลด DASHBOARD_URL จาก .env
+            $envFile = Join-Path $ScriptDir ".env"
+            $dashUrl = ""
+            if (Test-Path $envFile) {
+                $envContent = Get-Content $envFile | Where-Object { $_ -match "^DASHBOARD_URL=" }
+                if ($envContent) {
+                    $dashUrl = ($envContent -split "=", 2)[1].Trim()
+                }
+            }
+            if ($dashUrl -and $dashUrl -ne "") {
+                Write-Host "   🔗 Opening Cloud Dashboard: $dashUrl" -ForegroundColor Cyan
+                Start-Process $dashUrl
+            } else {
+                Write-Host "   🖥️ DASHBOARD_URL not set — starting local dashboard..." -ForegroundColor Yellow
+                Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$ScriptDir\run_dashboard.bat`""
+            }
             Start-Sleep -Seconds 2
         }
         "6" {

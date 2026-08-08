@@ -111,6 +111,8 @@ class MT5Client:
             WS_EX_TOOLWINDOW = 0x00000080
             
             EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_int, ctypes.c_int)
+            found_hwnds = []
+
             def foreach_window(hwnd, lparam):
                 pid = ctypes.c_ulong()
                 user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
@@ -118,11 +120,16 @@ class MT5Client:
                     ex_style = user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
                     new_ex_style = (ex_style & ~WS_EX_TOOLWINDOW) | WS_EX_APPWINDOW
                     user32.SetWindowLongW(hwnd, GWL_EXSTYLE, new_ex_style)
-                    user32.ShowWindow(hwnd, 5)  # 5 = SW_SHOW
+                    user32.ShowWindow(hwnd, 9)   # 9 = SW_RESTORE (restore จาก minimize)
+                    user32.BringWindowToTop(hwnd)
+                    user32.SetForegroundWindow(hwnd)
+                    found_hwnds.append(hwnd)
                 return True
 
             user32.EnumWindows(EnumWindowsProc(foreach_window), 0)
-            return True
+            if found_hwnds:
+                logger.info(f"XM MT5 window restored to foreground (PIDs: {target_pids}).")
+            return bool(found_hwnds)
         except Exception as e:
             logger.warning(f"Could not show MT5 window: {e}")
             return False
