@@ -1,6 +1,6 @@
 correlation_id,event_type,severity,delivery_status,latency_ms
-AURA-TG-TEST-001,System Heartbeat,INFO,FAILED ❌,0.01
-AURA-TG-TEST-002,Demo Signal Notification,INFO,FAILED ❌,0.0
-AURA-TG-TEST-003,Execution Lifecycle Notification,INFO,FAILED ❌,0.0
-AURA-TG-TEST-004,Safety Event Notification,WARNING,FAILED ❌,0.0
-AURA-TG-TEST-005,Error Alert Notification,ERROR,FAILED ❌,0.0
+AURA-TG-TEST-001,System Heartbeat,INFO,DELIVERED ✅,1480.08
+AURA-TG-TEST-002,Demo Signal Notification,INFO,DELIVERED ✅,1225.42
+AURA-TG-TEST-003,Execution Lifecycle Notification,INFO,DELIVERED ✅,1293.57
+AURA-TG-TEST-004,Safety Event Notification,WARNING,DELIVERED ✅,1479.37
+AURA-TG-TEST-005,Error Alert Notification,ERROR,DELIVERED ✅,1272.26

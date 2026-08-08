@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-08-08T14:34:40.592512+00:00",
+  "timestamp": "2026-08-08T14:37:15.868845+00:00",
   "endpoint": "getMe",
-  "http_status": null,
-  "api_ok": false,
-  "bot_username": "[REDACTED]",
-  "response_time_ms": 0.0,
-  "connectivity_class": "UNKNOWN"
+  "http_status": 200,
+  "api_ok": true,
+  "bot_username": "AI_Super_Trader_Kobot",
+  "response_time_ms": 1163.72,
+  "connectivity_class": "API_REACHABLE \u2705"
 }

@@ -1,12 +1,12 @@
 {
   "audit_version": "v6.13",
-  "timestamp": "2026-08-08T14:34:40.591887+00:00",
+  "timestamp": "2026-08-08T14:37:15.868299+00:00",
   "git_head": "79de322b93c2d08a9ca70d000217d3e989cf03c1",
-  "token_present": false,
-  "token_format_valid": false,
-  "chat_id_present": false,
-  "chat_id_format": "INVALID",
+  "token_present": true,
+  "token_format_valid": true,
+  "chat_id_present": true,
+  "chat_id_format": "NUMERIC_STRING",
   "config_source": ".env file / OS Environment",
   "secrets_redacted": true,
-  "status": "FAIL \u274c"
+  "status": "PASS \u2705"
 }
