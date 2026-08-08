@@ -1,0 +1,7 @@
+{
+  "hard_failure": false,
+  "economic_failure": false,
+  "fragility_failure": false,
+  "integrity_failure": false,
+  "status": "ALL_GATES_NORMAL \u2705"
+}

@@ -1,0 +1,10 @@
+{
+  "framework": "Alpha-Spending Always-Valid Sequential Inference",
+  "pre_registered": true,
+  "current_sample_n": 11,
+  "cumulative_alpha_spent": 0.002,
+  "remaining_alpha": 0.048,
+  "sequential_p_value": 0.527443,
+  "decision_boundary_crossed": false,
+  "status": "CONTINUE_DATA_COLLECTION"
+}

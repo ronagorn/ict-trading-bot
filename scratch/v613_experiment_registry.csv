@@ -1,0 +1,2 @@
+experiment_id,timestamp,hypothesis,dataset_version,parameters,test,result,confirmatory,influenced_any_decision,notes
+EXP_V613_01,2026-08-08T14:29:07.755845+00:00,v6.13 Sequential Evidence & Non-Parametric Bootstrap Evaluation,scratch/v611_forward_ledger.csv,"10,000 Resamples, Seed=42",Exact Binomial & IID Bootstrap,"Observed WR=36.36%, P(Exp>0)=60.35%",True,False,Pre-registered audit without strategy tuning

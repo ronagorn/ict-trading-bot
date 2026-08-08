@@ -1,0 +1,9 @@
+{
+  "num_bootstraps": 10000,
+  "seed": 42,
+  "p_expectancy_gt_0": 60.35,
+  "p_net_r_gt_0": 60.35,
+  "p_expectancy_le_0": 39.65,
+  "p_net_r_le_0": 39.65,
+  "exp_ci_95": "[-0.7273, 0.9091]"
+}

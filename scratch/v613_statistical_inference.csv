@@ -1,0 +1,2 @@
+test_type,k_wins,n_sample,observed_win_rate,wilson_95_ci,null_win_rate,statistic,p_value,conclusion
+Exact Binomial Test (H0: p <= 33.33%),4,11,36.36%,"[15.17%, 64.62%]",33.33%,0.3636,0.527443,"Point estimate positive (+0.2353R), N=17 requires further sample accumulation"
